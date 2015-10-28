@@ -1,0 +1,21 @@
+{
+   "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+   },
+   "default_locale": "en",
+   "description": "__MSG_description__",
+   "icons": {
+      "32": "images/logo32.png",
+      "64": "images/logo64.png",
+      "128": "images/logo128.png"
+   },
+   "manifest_version": 2,
+   "browser_action": {
+   "default_icon": "images/logo32.png"
+   },
+   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+   "permissions": [ "cookies", "tabs", "notifications", "activeTab", "contextMenus"],
+   "name": "__MSG_appName__",
+   "version": "0.0.1"
+}
