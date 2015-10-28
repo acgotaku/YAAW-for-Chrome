@@ -13,7 +13,9 @@
 #Install
 作为chrome扩展安装即可.
 
-Web Store link : https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc
+Web Store link : 
+
+https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc
 
 
 License
