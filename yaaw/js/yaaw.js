@@ -918,9 +918,10 @@ var YAAW = (function() {
 
       if (Notification.permission !== "granted")
         Notification.requestPermission();
-
+      var iconImage=chrome.extension.getURL('images/icon.jpg');
       var notification = new Notification(title, {
         body: content,
+        icon:iconImage
       });
 
       return notification;

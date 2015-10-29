@@ -93,7 +93,8 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
         "params": [[info.linkUrl],{}
         ]
     };
-    var result=parse_url(localStorage.getItem("jsonrpc_path") || "http://localhost:6800/jsonrpc");
+    var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
+    var result=parse_url(rpc_list[info.menuItemId]['url']);
     var auth=result[1];
     if (auth && auth.indexOf('token:') == 0) {
         rpc_data.params.unshift(auth);
@@ -104,7 +105,7 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
                 var opt={
                     type: "basic",
                     title: "下载成功",
-                    message: "导出下载成功~",
+                    message: "导出下载到"+rpc_list[info.menuItemId]['name']+"成功~",
                     iconUrl: "images/icon.jpg"
                 }
                 var id= new Date().getTime().toString();                    
@@ -126,7 +127,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'loading') {
     	var path = localStorage.getItem("jsonrpc_path") || "http://localhost:6800/jsonrpc";
     	chrome.contextMenus.removeAll();
-    	addContextMenu(chrome.runtime.id,"YAAW");
+        var contextMenus=localStorage.getItem("contextMenus");
+        if(contextMenus == "true" || contextMenus == null){
+            var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
+            for(var i in rpc_list){
+                addContextMenu(i,rpc_list[i]['name']);
+            }
+            localStorage.setItem("contextMenus", true);             
+        }
     }
        
 });
