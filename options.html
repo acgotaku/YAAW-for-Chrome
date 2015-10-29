@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8 />
+    <title>YAAW for Chrome Settings</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, width=device-width">
+    <link href="yaaw/img/favicon.ico" rel="shortcut icon" type="image/ico" />
+    <link href="yaaw/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="yaaw/css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <style type="text/css">
+    body {
+      padding-top: 150px;
+    }
+    #logo{
+      background-image: url(images/logo128.png);
+      background-size: 128px 128px;
+      width: 128px;
+      height: 128px;
+    }
+    .navbar{
+      background-color: #8191F1;
+      padding: 15px 15px 0 15px;
+      color: white;
+      z-index: 200;
+      box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+    }
+    .rpc-path{
+      margin-left: 10px;
+    }
+    </style>
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <nav class="navbar navbar-fixed-top">
+      <div class="container">
+        <div id="logo"></div>
+      </div>
+    </nav>
+    <div class="container">
+      <form class="form-horizontal">
+        <fieldset>
+          <legend>YAAW for Chrome Settings</legend>
+          <div class="control-group rpc">
+            <label class="control-label">JSON-RPC</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="rpc-name" placeholder="RPC Name">
+              <input type="text" class="input-xlarge rpc-path" id="rpc-path" placeholder="RPC Path">
+              <button class="btn" id="add-rpc">Add RPC</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+
+
+    </div>
+    <script src="yaaw/js/jquery-1.7.2.min.js"></script>
+    <script src="yaaw/js/bootstrap.min.js"></script>
+    <script src="js/options.js"></script>
+  </body>
+</html>
+<!-- vim: set et sw=2 ts=2 sts=2 ff=unix fenc=utf8: -->

@@ -58,11 +58,11 @@ function addContextMenu(id,title){
     });
 }
 //弹出chrome通知
-function showNotification(opt){
-    var notification = chrome.notifications.create(status.toString(),opt,function(notifyId){return notifyId});
+function showNotification(id,opt){
+    var notification = chrome.notifications.create(id,opt,function(notifyId){return notifyId});
     setTimeout(function(){
-        chrome.notifications.clear(status.toString(),function(){});
-    },5000);
+        chrome.notifications.clear(id,function(){});
+    },3000);
 }
 //解析RPC地址
 function parse_url(url){
@@ -106,8 +106,9 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
                     title: "下载成功",
                     message: "导出下载成功~",
                     iconUrl: "images/icon.jpg"
-                }                    
-                showNotification(opt);
+                }
+                var id= new Date().getTime().toString();                    
+                showNotification(id,opt);
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 var opt={
@@ -115,8 +116,9 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
                     title: "下载失败",
                     message: "导出下载失败! QAQ",
                     iconUrl: "images/icon.jpg"
-                }                    
-                showNotification(opt);
+                }      
+                var id= new Date().getTime().toString();                    
+                showNotification(id,opt);
             }); 
 });
 
