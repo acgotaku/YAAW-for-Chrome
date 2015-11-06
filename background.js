@@ -1,3 +1,4 @@
+const defaultRPC='[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]';
 var HttpSendRead = function(info) {
     Promise.prototype.done=Promise.prototype.then;
     Promise.prototype.fail=Promise.prototype.catch;
@@ -85,58 +86,80 @@ function parse_url(url){
     return [url_path,auth];
 }
 
+function aria2Send(link,url){
+    chrome.cookies.getAll({"url":link}, function(cookies) {
+        var format_cookies = [];
+        for (var i in cookies) {
+            var cookie = cookies[i];
+            format_cookies.push(cookie.name +"="+cookie.value);
+        }
+        var header="Cookie: " + format_cookies.join(";");
+        var rpc_data = {
+            "jsonrpc": "2.0",
+            "method": "aria2.addUri",
+            "id": new Date().getTime(),
+            "params": [[link],{
+                "header":header
+            }]
+        };
+        var result=parse_url(url);
+        var auth=result[1];
+        if (auth && auth.indexOf('token:') == 0) {
+            rpc_data.params.unshift(auth);
+        }
+        var parameter = {'url': result[0], 'dataType': 'json', type: 'POST', data: JSON.stringify(rpc_data), 'headers': {'Authorization': auth}};
+        HttpSendRead(parameter)
+                .done(function(json, textStatus, jqXHR) {
+                    var opt={
+                        type: "basic",
+                        title: "下载成功",
+                        message: "导出下载到"+rpc_list[info.menuItemId]['name']+"成功~",
+                        iconUrl: "images/icon.jpg"
+                    }
+                    var id= new Date().getTime().toString();                    
+                    showNotification(id,opt);
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    var opt={
+                        type: "basic",
+                        title: "下载失败",
+                        message: "导出下载失败! QAQ",
+                        iconUrl: "images/icon.jpg"
+                    }      
+                    var id= new Date().getTime().toString();                    
+                    showNotification(id,opt);
+                }); 
+    });
+
+}
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-    var rpc_data = {
-        "jsonrpc": "2.0",
-        "method": "aria2.addUri",
-        "id": new Date().getTime(),
-        "params": [[info.linkUrl],{}
-        ]
-    };
-    var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
-    var result=parse_url(rpc_list[info.menuItemId]['url']);
-    var auth=result[1];
-    if (auth && auth.indexOf('token:') == 0) {
-        rpc_data.params.unshift(auth);
-    }
-    var parameter = {'url': result[0], 'dataType': 'json', type: 'POST', data: JSON.stringify(rpc_data), 'headers': {'Authorization': auth}};
-    HttpSendRead(parameter)
-            .done(function(json, textStatus, jqXHR) {
-                var opt={
-                    type: "basic",
-                    title: "下载成功",
-                    message: "导出下载到"+rpc_list[info.menuItemId]['name']+"成功~",
-                    iconUrl: "images/icon.jpg"
-                }
-                var id= new Date().getTime().toString();                    
-                showNotification(id,opt);
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                var opt={
-                    type: "basic",
-                    title: "下载失败",
-                    message: "导出下载失败! QAQ",
-                    iconUrl: "images/icon.jpg"
-                }      
-                var id= new Date().getTime().toString();                    
-                showNotification(id,opt);
-            }); 
+    console.log(info);
+    aria2Send(info.linkUrl,info.menuItemId);
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'loading') {
-    	var path = localStorage.getItem("jsonrpc_path") || "http://localhost:6800/jsonrpc";
-    	chrome.contextMenus.removeAll();
+        chrome.contextMenus.removeAll();
         var contextMenus=localStorage.getItem("contextMenus");
         if(contextMenus == "true" || contextMenus == null){
-            var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
+            var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
             for(var i in rpc_list){
-                addContextMenu(i,rpc_list[i]['name']);
+                addContextMenu(rpc_list[i]['url'],rpc_list[i]['name']);
             }
             localStorage.setItem("contextMenus", true);             
         }
     }
        
+});
+chrome.downloads.onCreated.addListener(function(downloadItem){
+    console.log(downloadItem);
+    var integration =localStorage.getItem("integration");
+    var fileSize =localStorage.getItem("fileSize");
+    if(integration && downloadItem.fileSize > fileSize*1024*1024){
+        var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
+        aria2Send(downloadItem.url,rpc_list[0]['url']);
+        chrome.downloads.cancel(downloadItem.id,function(){});
+    }
 });
 chrome.browserAction.onClicked.addListener(function(){
     var index=chrome.extension.getURL('yaaw/index.html');

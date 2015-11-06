@@ -1,10 +1,16 @@
 $(function(){
-	var contextMenus=localStorage.getItem("contextMenus");
-	if(contextMenus == "true"){
-		$("#contextMenus").prop('checked', true);
-	}
-	var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
-	for(var i in rpc_list){
+    var contextMenus=localStorage.getItem("contextMenus");
+    if(contextMenus == "true"){
+        $("#contextMenus").prop('checked', true);
+    }
+    var integration=localStorage.getItem("integration");
+    if(integration == "true"){
+        $("#integration").prop('checked', true);
+    }
+    var fileSize=localStorage.getItem("fileSize")||500;
+    $("#fileSize").val(fileSize);
+    var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||'[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]');
+    for(var i in rpc_list){
         var addBtn=0==i?'<button class="btn" id="add-rpc">Add RPC</button>':'';
         var row='<div class="control-group rpc_list"><label class="control-label">JSON-RPC</label><div class="controls"><input type="text" class="input-small" value="'+rpc_list[i]['name']+'" placeholder="RPC Name"><input type="text" class="input-xlarge rpc-path" value="'+rpc_list[i]['url']+'" placeholder="RPC Path">'+addBtn+'</div></div>';
         if($(".rpc_list").length>0){
@@ -38,6 +44,13 @@ $(function(){
         }else{
             localStorage.setItem("contextMenus", false);
         }
+        if($("#integration").prop('checked') == true){
+            localStorage.setItem("integration", true);
+        }else{
+            localStorage.setItem("integration", false);
+        }
+        var fileSize=$("#fileSize").val();
+        localStorage.setItem("fileSize", fileSize);
     });
     $("#reset").on("click",function(){
         localStorage.clear();
