@@ -113,13 +113,14 @@ function aria2Send(link,url){
                     var opt={
                         type: "basic",
                         title: "下载成功",
-                        message: "导出下载到"+rpc_list[info.menuItemId]['name']+"成功~",
+                        message: "导出下载成功~",
                         iconUrl: "images/icon.jpg"
                     }
                     var id= new Date().getTime().toString();                    
                     showNotification(id,opt);
                 })
                 .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
                     var opt={
                         type: "basic",
                         title: "下载失败",
@@ -155,8 +156,12 @@ chrome.downloads.onCreated.addListener(function(downloadItem){
     console.log(downloadItem);
     var integration =localStorage.getItem("integration");
     var fileSize =localStorage.getItem("fileSize");
+    if(downloadItem.error){
+        return;
+    }
     if(integration && downloadItem.fileSize > fileSize*1024*1024){
         var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
+        console.log("success");
         aria2Send(downloadItem.url,rpc_list[0]['url']);
         chrome.downloads.cancel(downloadItem.id,function(){});
     }
