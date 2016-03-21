@@ -133,6 +133,25 @@ function aria2Send(link,url){
     });
 
 }
+function isCapture(downloadItem){
+    var fileSize =localStorage.getItem("fileSize");
+    var white_site =JSON.parse(localStorage.getItem("white_site"));
+    var black_site =JSON.parse(localStorage.getItem("black_site"));
+    var url =downloadItem.referrer;
+    var parse_url=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
+    var result=parse_url.exec(url)[3];
+    if(black_site.join("|").indexOf(result)> -1){
+        return false;
+    }
+    if(white_site.join("|").indexOf(result)> -1){
+        return true;
+    }
+    if(downloadItem.fileSize > fileSize*1024*1024){
+        return true;
+    }else{
+        return false;
+    }
+}
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     console.log(info);
     aria2Send(info.linkUrl,info.menuItemId);
@@ -155,11 +174,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 chrome.downloads.onCreated.addListener(function(downloadItem){
     console.log(downloadItem);
     var integration =localStorage.getItem("integration");
-    var fileSize =localStorage.getItem("fileSize");
     if(downloadItem.error){
         return;
     }
-    if(integration && downloadItem.fileSize > fileSize*1024*1024){
+    if(integration && isCapture(downloadItem)){
         var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
         console.log("success");
         aria2Send(downloadItem.url,rpc_list[0]['url']);
@@ -179,3 +197,18 @@ chrome.browserAction.onClicked.addListener(function(){
     });
      
 });
+
+//软件版本更新提示
+var manifest = chrome.runtime.getManifest();
+var previousVersion=localStorage.getItem("version");
+if(previousVersion == "" || previousVersion != manifest.version){
+    var opt={
+        type: "basic",
+        title: "更新",
+        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新添加白名单和黑名单功能~",
+        iconUrl: "images/icon.jpg"
+    };
+    var id= new Date().getTime().toString();
+    showNotification(id,opt);
+    localStorage.setItem("version",manifest.version);
+}
