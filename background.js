@@ -93,7 +93,10 @@ function aria2Send(link,url){
             var cookie = cookies[i];
             format_cookies.push(cookie.name +"="+cookie.value);
         }
-        var header="Cookie: " + format_cookies.join(";");
+        var header=[];
+        header.push("Cookie: " + format_cookies.join(";"));
+        header.push("User-Agent: " + navigator.userAgent);
+        header.push("Connection: keep-alive");
         var rpc_data = {
             "jsonrpc": "2.0",
             "method": "aria2.addUri",
@@ -139,6 +142,9 @@ function isCapture(downloadItem){
     var black_site =JSON.parse(localStorage.getItem("black_site"));
     var url =downloadItem.referrer|| url;
     console.log(downloadItem);
+    if(downloadItem.error || downloadItem.state != "in_progress"){
+        return false;
+    }
     var parse_url=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var result=parse_url.exec(url)[3];
     if(black_site.join("|").indexOf(result)> -1){
@@ -173,11 +179,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
        
 });
 chrome.downloads.onCreated.addListener(function(downloadItem){
-    console.log(downloadItem);
     var integration =localStorage.getItem("integration");
-    if(downloadItem.error){
-        return;
-    }
     if(integration && isCapture(downloadItem)){
         var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
         console.log("success");
