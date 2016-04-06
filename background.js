@@ -142,7 +142,7 @@ function isCapture(downloadItem){
     var black_site =JSON.parse(localStorage.getItem("black_site"));
     var url =downloadItem.referrer|| url;
     console.log(downloadItem);
-    if(downloadItem.error || downloadItem.state != "in_progress"){
+    if(downloadItem.error || downloadItem.state != "in_progress" || url.startsWith("http") == false){
         return false;
     }
     var parse_url=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
@@ -208,7 +208,7 @@ if(previousVersion == "" || previousVersion != manifest.version){
     var opt={
         type: "basic",
         title: "更新",
-        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新修复BUG~",
+        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新修复MEGA错误拦截的BUG~",
         iconUrl: "images/icon.jpg"
     };
     var id= new Date().getTime().toString();

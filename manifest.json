@@ -18,5 +18,5 @@
    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
    "permissions": [ "cookies", "tabs", "notifications", "activeTab", "contextMenus", "downloads", "<all_urls>"],
    "name": "__MSG_appName__",
-   "version": "0.0.5"
+   "version": "0.0.6"
 }
