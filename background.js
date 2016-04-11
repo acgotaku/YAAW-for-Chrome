@@ -140,8 +140,7 @@ function isCapture(downloadItem){
     var fileSize =localStorage.getItem("fileSize");
     var white_site =JSON.parse(localStorage.getItem("white_site"));
     var black_site =JSON.parse(localStorage.getItem("black_site"));
-    var url =downloadItem.referrer|| url;
-    console.log(downloadItem);
+    var url =downloadItem.referrer|| downloadItem.url;
     if(downloadItem.error || downloadItem.state != "in_progress" || url.startsWith("http") == false){
         return false;
     }
@@ -160,7 +159,6 @@ function isCapture(downloadItem){
     }
 }
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-    console.log(info);
     aria2Send(info.linkUrl,info.menuItemId);
 });
 
@@ -180,13 +178,33 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 chrome.downloads.onCreated.addListener(function(downloadItem){
     var integration =localStorage.getItem("integration");
-    if(integration && isCapture(downloadItem)){
+    if(integration == "true" && isCapture(downloadItem)){
         var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
-        console.log("success");
         aria2Send(downloadItem.url,rpc_list[0]['url']);
         chrome.downloads.cancel(downloadItem.id,function(){});
     }
 });
+chrome.webRequest.onHeadersReceived.addListener(function(details){
+    for (var i = 0; i < details.responseHeaders.length; ++i) {
+        if (details.responseHeaders[i].name === 'Content-Type' && details.responseHeaders[i].value === 'application/octet-stream') {
+            var item = details.responseHeaders;
+            var flag = 0;
+            item.filter(function(obj){
+                if(obj.name === 'Content-Length' && obj.value == 0){
+                    flag++;
+                }
+                if(obj.name === 'Content-Transfer-Encoding' || obj.name == 'Transfer-Encoding'){
+                    flag++;
+                } 
+            });
+            if(!flag){
+                console.log(details);
+            }
+        }
+    }
+
+},{urls: ["<all_urls>"]}, ["blocking","responseHeaders"]);
+
 chrome.browserAction.onClicked.addListener(function(){
     var index=chrome.extension.getURL('yaaw/index.html');
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
