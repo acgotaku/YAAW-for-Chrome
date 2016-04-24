@@ -141,9 +141,11 @@ function isCapture(downloadItem){
     var white_site =JSON.parse(localStorage.getItem("white_site"));
     var black_site =JSON.parse(localStorage.getItem("black_site"));
     var url =downloadItem.referrer|| downloadItem.url;
+
     if(downloadItem.error || downloadItem.state != "in_progress" || url.startsWith("http") == false){
         return false;
     }
+
     var parse_url=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var result=parse_url.exec(url)[3];
     if(black_site.join("|").indexOf(result)> -1){
@@ -176,6 +178,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     }
        
 });
+
 chrome.downloads.onCreated.addListener(function(downloadItem){
     var integration =localStorage.getItem("integration");
     if(integration == "true" && isCapture(downloadItem)){
@@ -184,27 +187,42 @@ chrome.downloads.onCreated.addListener(function(downloadItem){
         chrome.downloads.cancel(downloadItem.id,function(){});
     }
 });
+
+/*
 chrome.webRequest.onHeadersReceived.addListener(function(details){
     for (var i = 0; i < details.responseHeaders.length; ++i) {
         if (details.responseHeaders[i].name === 'Content-Type' && details.responseHeaders[i].value === 'application/octet-stream') {
             var item = details.responseHeaders;
             var flag = 0;
+            var downloadItem ={url:null,name:null,fileSize:0};
             item.filter(function(obj){
                 if(obj.name === 'Content-Length' && obj.value == 0){
                     flag++;
                 }
-                if(obj.name === 'Content-Transfer-Encoding' || obj.name == 'Transfer-Encoding'){
+                if(obj.name === 'Content-Transfer-Encoding' || obj.name == 'Transfer-Encoding'|| obj.name == 'Content-Encoding'){
                     flag++;
                 } 
+                if(obj.name === 'Content-Disposition'){
+                    downloadItem.name= decodeURIComponent(obj.value.split("=")[1]);
+                }
+                if(obj.name === 'Content-Length'){
+                    downloadItem.fileSize= obj.value;
+                }
             });
             if(!flag){
-                console.log(details);
+                downloadItem.url = details.url;
+                var integration =localStorage.getItem("integration");
+                if(integration == "true" && isCapture(downloadItem)){
+                    var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
+                    aria2Send(downloadItem.url,rpc_list[0]['url']);
+                }
+                return {cancel: true};
             }
         }
     }
 
 },{urls: ["<all_urls>"]}, ["blocking","responseHeaders"]);
-
+*/
 chrome.browserAction.onClicked.addListener(function(){
     var index=chrome.extension.getURL('yaaw/index.html');
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
