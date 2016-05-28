@@ -244,7 +244,7 @@ if(previousVersion == "" || previousVersion != manifest.version){
     var opt={
         type: "basic",
         title: "更新",
-        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新修复MEGA错误拦截的BUG~",
+        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新修复无法取消拦截的的BUG~",
         iconUrl: "images/icon.jpg"
     };
     var id= new Date().getTime().toString();
