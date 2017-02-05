@@ -94,7 +94,7 @@ function aria2Send(link,url){
             format_cookies.push(cookie.name +"="+cookie.value);
         }
         var header=[];
-        header.push("Cookie: " + format_cookies.join(";"));
+        header.push("Cookie: " + format_cookies.join("; "));
         header.push("User-Agent: " + navigator.userAgent);
         header.push("Connection: keep-alive");
         var rpc_data = {
