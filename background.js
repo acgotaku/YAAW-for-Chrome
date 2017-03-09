@@ -136,9 +136,11 @@ function aria2Send(link,url){
     });
 
 }
+
 function matchRule(str, rule) {
   return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
 }
+
 function isCapture(downloadItem){
     var fileSize =localStorage.getItem("fileSize");
     var white_site =JSON.parse(localStorage.getItem("white_site"));
