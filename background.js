@@ -136,6 +136,11 @@ function aria2Send(link,url){
     });
 
 }
+
+function matchRule(str, rule) {
+  return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
+}
+
 function isCapture(downloadItem){
     var fileSize =localStorage.getItem("fileSize");
     var white_site =JSON.parse(localStorage.getItem("white_site"));
@@ -148,12 +153,20 @@ function isCapture(downloadItem){
 
     var parse_url=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var result=parse_url.exec(url)[3];
-    if(black_site.join("|").indexOf(result)> -1){
-        return false;
+
+    for (var i=0; i< white_site.length;i++){
+        if(matchRule(result,white_site[i])){
+            return true;
+        }
     }
-    if(white_site.join("|").indexOf(result)> -1){
-        return true;
+
+    for (var i=0; i< black_site.length;i++){
+        if(matchRule(result,black_site[i])){
+            return false;
+        }
     }
+
+
     if(downloadItem.fileSize >= fileSize*1024*1024){
         return true;
     }else{
@@ -244,7 +257,7 @@ if(previousVersion == "" || previousVersion != manifest.version){
     var opt={
         type: "basic",
         title: "更新",
-        message: "YAAW for Chrome更新到" +manifest.version + "版本啦～\n此次更新修复无法取消拦截的的BUG~",
+        message: "YAAW for Chrome更新到" + manifest.version + "版本啦～\n此次更新支持通配符匹配~",
         iconUrl: "images/icon.jpg"
     };
     var id= new Date().getTime().toString();
