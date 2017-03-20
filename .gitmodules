@@ -3,4 +3,4 @@
 	url = git@github.com:binux/yaaw.git
 [submodule "webui-aria2"]
 	path = webui-aria2
-	url = git@github.com:ipcjs/webui-aria2.git
+	url = git@github.com:ziahamza/webui-aria2.git
