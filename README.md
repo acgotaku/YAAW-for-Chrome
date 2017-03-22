@@ -1,8 +1,8 @@
-#YAAW for Chrome
+# YAAW for Chrome
 
 简单的把YAAW打包发布到Chrome上,安装之后会出现YAAW的图标.
 
-#Usage
+# Usage
 
 
 点击YAAW图标便会出现YAAW的管理界面,设置好 JSON-RPC Path即可.
@@ -16,7 +16,7 @@
 开启右键菜单之后任意链接都可以右键导出到YAAW进行下载.
 
 
-#Install
+# Install
 作为chrome扩展安装即可.
 
 Web Store link : 
