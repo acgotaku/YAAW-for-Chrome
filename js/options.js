@@ -3,6 +3,12 @@ $(function(){
         return {
             init:function(){
                 var self =this;
+                var aria2UI = localStorage.getItem("aria2UI") || 'yaaw/index.html';
+                $('#aria2-ui-group input').each(function(index, ele){
+                    if(aria2UI == ele.value){
+                        ele.checked = true;
+                    }
+                });
                 var contextMenus=localStorage.getItem("contextMenus");
                 if(contextMenus == "true"){
                     $("#contextMenus").prop('checked', true);
@@ -48,6 +54,7 @@ $(function(){
                 });
             },
             save:function(){
+                localStorage.setItem("aria2UI", $('#aria2-ui-group input:checked').val());
                 var rpc_list=[];
                 var jsonrpc_history=[];
                 for(var i=0;i<$(".rpc_list").length;i++){
