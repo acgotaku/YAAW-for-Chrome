@@ -86,7 +86,7 @@ function parse_url(url){
     return [url_path,auth];
 }
 
-function aria2Send(link,url){
+function aria2Send(link,url,output){
     chrome.cookies.getAll({"url":link}, function(cookies) {
         var format_cookies = [];
         for (var i in cookies) {
@@ -105,6 +105,8 @@ function aria2Send(link,url){
                 "header":header
             }]
         };
+        if (output)
+        rpc_data.params[1]["out"]=output;
         var result=parse_url(url);
         var auth=result[1];
         if (auth && auth.indexOf('token:') == 0) {
@@ -174,7 +176,7 @@ function isCapture(downloadItem){
     }
 }
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-    aria2Send(info.linkUrl,info.menuItemId);
+    aria2Send(info.linkUrl,info.menuItemId,null);
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -192,14 +194,26 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
        
 });
 
+chrome.downloads.onDeterminingFilename.addListener(function(downloadItem){
+    var integration =localStorage.getItem("integration");
+    if(integration == "true" && isCapture(downloadItem)){
+        var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
+        console.log(decodeURIComponent(downloadItem.filename));
+        aria2Send(downloadItem.url,rpc_list[0]['url'],decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop());
+        //chrome.downloads.cancel(downloadItem.id,function(){});
+    }
+});
+
 chrome.downloads.onCreated.addListener(function(downloadItem){
     var integration =localStorage.getItem("integration");
     if(integration == "true" && isCapture(downloadItem)){
         var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
-        aria2Send(downloadItem.url,rpc_list[0]['url']);
+        console.log(decodeURIComponent(downloadItem.filename));
+        //aria2Send(downloadItem.url,rpc_list[0]['url'],decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop());
         chrome.downloads.cancel(downloadItem.id,function(){});
     }
 });
+
 
 /*
 chrome.webRequest.onHeadersReceived.addListener(function(details){
@@ -227,7 +241,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(details){
                 var integration =localStorage.getItem("integration");
                 if(integration == "true" && isCapture(downloadItem)){
                     var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
-                    aria2Send(downloadItem.url,rpc_list[0]['url']);
+                    aria2Send(downloadItem.url,rpc_list[0]['url'],null);
                 }
                 return {cancel: true};
             }
