@@ -193,17 +193,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 });
 
-var selfDefault = chrome.downloads.setShelfEnabled;
-
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
     var integration = localStorage.getItem("integration");
     if (integration == "true" && isCapture(downloadItem)) {
-        if (chrome.downloads.setShelfEnabled)
-            chrome.downloads.setShelfEnabled(false);
         setTimeout(function () {
             chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
                 var rpc_list = JSON.parse(localStorage.getItem("rpc_list") || defaultRPC);
-                console.log(decodeURIComponent(downloadItem.filename));
+                //console.log(decodeURIComponent(downloadItem.filename));
                 aria2Send(downloadItem.url, rpc_list[0]['url'], {
                     "filename": decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
                     "icon": iconUrl || "images/icon.jpg",
@@ -212,11 +208,7 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
             });
             chrome.downloads.cancel(downloadItem.id, function () { });
             chrome.downloads.erase({ id: downloadItem.id });
-            if (selfDefault && !chrome.downloads.setShelfEnabled)
-                chrome.downloads.setShelfEnabled(true);
         }, 500);
-        //will cause Unchecked runtime.lastError while running downloadsInternal.determineFilename: Download must be in progress
-        //A solution is to append canel in success notification, which will cause the downloading process pop up and be cancelled
     }
 });
 
