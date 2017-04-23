@@ -77,7 +77,7 @@ var YAAW = (function() {
       $("#btnClearAlert").live("click", function() {
         $('#main-alert').hide();
       });
-      $("#btnSeleceActive").live("click", function() {
+      $("#btnSelectActive").live("click", function() {
         YAAW.tasks.selectActive();
       });
       $("#btnSelectWaiting").live("click", function() {
@@ -86,8 +86,8 @@ var YAAW = (function() {
       $("#btnSelectPaused").live("click", function() {
         YAAW.tasks.selectPaused();
       });
-      $("#btnSelectStoped").live("click", function() {
-        YAAW.tasks.selectStoped();
+      $("#btnSelectStopped").live("click", function() {
+        YAAW.tasks.selectStopped();
       });
       $("#btnStartAll").live("click", function() {
         ARIA2.unpause_all();
@@ -111,7 +111,7 @@ var YAAW = (function() {
         YAAW.contextmenu.movedown();
       });
       $("#menuMoveEnd").live("click", function() {
-        YAAW.contextmenu.moveEnd();
+        YAAW.contextmenu.moveend();
       });
       $("#menuRestart").live("click", function() {
         YAAW.contextmenu.restart();
@@ -632,10 +632,10 @@ var YAAW = (function() {
         this.check_select();
       },
 
-      selectStoped: function() {
+      selectStopped: function() {
         var _this = this;
         this.unSelectAll(true);
-        $("#stoped-tasks-table .task").each(function(i, n) {
+        $("#stopped-tasks-table .task").each(function(i, n) {
           _this.select(n);
         });
         this.check_select();
@@ -661,17 +661,17 @@ var YAAW = (function() {
 
       unpause: function() {
         var gids = new Array();
-        var stoped_gids = new Array();
+        var stopped_gids = new Array();
         $(".tasks-table .task.selected").each(function(i, n) {
           var status = n.getAttribute("data-status");
           if (status == "paused") {
             gids.push(n.getAttribute("data-gid"));
           } else if ("removed/error".indexOf(status) != -1) {
-            stoped_gids.push(n.getAttribute("data-gid"));
+            stopped_gids.push(n.getAttribute("data-gid"));
           }
         });
         if (gids.length) ARIA2.unpause(gids);
-        if (stoped_gids.length) ARIA2.restart_task(stoped_gids);
+        if (stopped_gids.length) ARIA2.restart_task(stopped_gids);
       },
 
       remove: function() {
@@ -691,7 +691,7 @@ var YAAW = (function() {
       info: function(task) {
         task.addClass("info-open");
         task.after(YAAW.tpl.info_box({gid: task.attr("data-gid")}));
-        if (task.parents("#stoped-tasks-table").length) {
+        if (task.parents("#stopped-tasks-table").length) {
           $("#ib-options-a").hide();
         }
         ARIA2.get_status(task.attr("data-gid"));
@@ -729,7 +729,7 @@ var YAAW = (function() {
             $("#task-contextmenu .task-move").show();
           else
             $("#task-contextmenu .task-move").hide();
-          if (status == "removed" || status == "completed" || status == "error") {
+          if (status == "removed" || status == "complete" || status == "error") {
             $(".task-restart").show();
             $(".task-start").hide();
           } else {
@@ -780,7 +780,14 @@ var YAAW = (function() {
       },
 
       remove: function() {
-        if (on_gid) ARIA2.remove(on_gid);
+        if (on_gid) {
+          var status = $("#task-gid-"+on_gid).attr("data-status");
+          if (status == "removed" || status == "complete" || status == "error") {
+            ARIA2.remove_result(on_gid);
+          } else {
+            ARIA2.remove(on_gid);
+          }
+        }
         on_gid = null;
       },
 
@@ -808,7 +815,7 @@ var YAAW = (function() {
 
     setting: {
       init: function() {
-        this.jsonrpc_path = $.Storage.get("jsonrpc_path") || "http://localhost:6800/jsonrpc";
+        this.jsonrpc_path = $.Storage.get("jsonrpc_path") || location.protocol+"//"+(location.host.split(":")[0]||"localhost")+":6800"+"/jsonrpc";
         this.refresh_interval = Number($.Storage.get("refresh_interval") || 10000);
         this.finish_notification = Number($.Storage.get("finish_notification") || 1);
         this.add_task_option = $.Storage.get("add_task_option");
@@ -868,6 +875,9 @@ var YAAW = (function() {
           });
           $(".rpc-path-wrap .dropdown-toggle").removeAttr("disabled").dropdown();
         }
+        if (this.finish_notification && Notification.permission !== "granted") {
+          Notification.requestPermission();
+        }
       },
 
       submit: function() {
@@ -897,6 +907,9 @@ var YAAW = (function() {
         if (changed) {
           this.save();
         }
+        if (this.finish_notification && Notification.permission !== "granted") {
+          Notification.requestPermission();
+        }
 
         // submit aria2 global setting
         var options = {};
@@ -918,10 +931,9 @@ var YAAW = (function() {
 
       if (Notification.permission !== "granted")
         Notification.requestPermission();
-      var iconImage=chrome.extension.getURL('images/icon.jpg');
+
       var notification = new Notification(title, {
         body: content,
-        icon:iconImage
       });
 
       return notification;
