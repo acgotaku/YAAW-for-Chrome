@@ -5,7 +5,7 @@ var HttpSendRead = function (info) {
     return new Promise(function (resolve, reject) {
         var http = new XMLHttpRequest();
         var contentType = "\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002f\u0078\u002d\u0077\u0077\u0077\u002d\u0066\u006f\u0072\u006d\u002d\u0075\u0072\u006c\u0065\u006e\u0063\u006f\u0064\u0065\u0064\u003b\u0020\u0063\u0068\u0061\u0072\u0073\u0065\u0074\u003d\u0055\u0054\u0046\u002d\u0038";
-        var timeout = 3000;
+        var timeout = 6000;
         if (info.contentType != null) {
             contentType = info.contentType;
         }
@@ -196,19 +196,27 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
     var integration = localStorage.getItem("integration");
     if (integration == "true" && isCapture(downloadItem)) {
-        setTimeout(function () {
-            chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
-                var rpc_list = JSON.parse(localStorage.getItem("rpc_list") || defaultRPC);
-                //console.log(decodeURIComponent(downloadItem.filename));
-                aria2Send(downloadItem.url, rpc_list[0]['url'], {
-                    "filename": decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
-                    "icon": iconUrl || "images/icon.jpg",
-                    "id": downloadItem.id
-                });
+        function cancelDownloadandstartAria() {
+            chrome.downloads.search({ id: downloadItem.id }, function (downloadItems) {
+                downloadItem = downloadItems.pop();
+                if (downloadItem.bytesReceived > 0) {
+                    chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
+                        var rpc_list = JSON.parse(localStorage.getItem("rpc_list") || defaultRPC);
+                        aria2Send(downloadItem.url, rpc_list[0]['url'], {
+                            "filename": decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
+                            "icon": iconUrl || "images/icon.jpg",
+                            "id": downloadItem.id
+                        });
+                    });
+                    chrome.downloads.cancel(downloadItem.id, function () {
+                        chrome.downloads.erase({ id: downloadItem.id });
+                    });
+                } else {
+                    setTimeout(cancelDownloadandstartAria, 500);
+                }
             });
-            chrome.downloads.cancel(downloadItem.id, function () { });
-            chrome.downloads.erase({ id: downloadItem.id });
-        }, 500);
+        };
+        setTimeout(cancelDownloadandstartAria, 500);
     }
 });
 
