@@ -1,8 +1,8 @@
 const defaultRPC = '[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]';
-var HttpSendRead = function (info) {
+var HttpSendRead = function(info) {
     Promise.prototype.done = Promise.prototype.then;
     Promise.prototype.fail = Promise.prototype.catch;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var http = new XMLHttpRequest();
         var contentType = "\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002f\u0078\u002d\u0077\u0077\u0077\u002d\u0066\u006f\u0072\u006d\u002d\u0075\u0072\u006c\u0065\u006e\u0063\u006f\u0064\u0065\u0064\u003b\u0020\u0063\u0068\u0061\u0072\u0073\u0065\u0074\u003d\u0055\u0054\u0046\u002d\u0038";
         var timeout = 6000;
@@ -13,22 +13,21 @@ var HttpSendRead = function (info) {
             timeout = info.timeout;
         }
         var timeId = setTimeout(httpclose, timeout);
+
         function httpclose() {
             http.abort();
         }
-        http.onreadystatechange = function () {
+        http.onreadystatechange = function() {
             if (http.readyState == 4) {
                 if ((http.status == 200 && http.status < 300) || http.status == 304) {
                     clearTimeout(timeId);
                     if (info.dataType == "json") {
                         resolve(JSON.parse(http.responseText), http.status, http);
-                    }
-                    else if (info.dataType == "SCRIPT") {
+                    } else if (info.dataType == "SCRIPT") {
                         // eval(http.responseText);
                         resolve(http.responseText, http.status, http);
                     }
-                }
-                else {
+                } else {
                     clearTimeout(timeId);
                     reject(http, http.statusText, http.status);
                 }
@@ -43,8 +42,7 @@ var HttpSendRead = function (info) {
         }
         if (info.type == "POST") {
             http.send(info.data);
-        }
-        else {
+        } else {
             http.send();
         }
     });
@@ -60,9 +58,11 @@ function addContextMenu(id, title) {
 }
 //弹出chrome通知
 function showNotification(id, opt) {
-    var notification = chrome.notifications.create(id, opt, function (notifyId) { return notifyId });
-    setTimeout(function () {
-        chrome.notifications.clear(id, function () { });
+    var notification = chrome.notifications.create(id, opt, function(notifyId) {
+        return notifyId
+    });
+    setTimeout(function() {
+        chrome.notifications.clear(id, function() {});
     }, 3000);
 }
 //解析RPC地址
@@ -77,9 +77,11 @@ function parse_url(url) {
         }
     }
     var url_path = remove_auth(url);
+
     function request_auth(url) {
         return url.match(/^(?:(?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1];
     }
+
     function remove_auth(url) {
         return url.replace(/^((?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3');
     }
@@ -87,7 +89,7 @@ function parse_url(url) {
 }
 
 function aria2Send(link, url, output) {
-    chrome.cookies.getAll({ "url": link }, function (cookies) {
+    chrome.cookies.getAll({ "url": link }, function(cookies) {
         var format_cookies = [];
         for (var i in cookies) {
             var cookie = cookies[i];
@@ -101,9 +103,11 @@ function aria2Send(link, url, output) {
             "jsonrpc": "2.0",
             "method": "aria2.addUri",
             "id": new Date().getTime(),
-            "params": [[link], {
-                "header": header
-            }]
+            "params": [
+                [link], {
+                    "header": header
+                }
+            ]
         };
         if (output){
             rpc_data.params[1]["dir"] = output.dir;
@@ -117,7 +121,7 @@ function aria2Send(link, url, output) {
         }
         var parameter = { 'url': result[0], 'dataType': 'json', type: 'POST', data: JSON.stringify(rpc_data), 'headers': { 'Authorization': auth } };
         HttpSendRead(parameter)
-            .done(function (json, textStatus, jqXHR) {
+            .done(function(json, textStatus, jqXHR) {
                 var opt = {
                     type: "basic",
                     title: "开始下载",
@@ -127,7 +131,7 @@ function aria2Send(link, url, output) {
                 var id = new Date().getTime().toString();
                 showNotification(id, opt);
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR);
                 var opt = {
                     type: "basic",
@@ -177,11 +181,11 @@ function isCapture(downloadItem) {
         return false;
     }
 }
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
     aria2Send(info.linkUrl, info.menuItemId, null);
 });
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'loading') {
         chrome.contextMenus.removeAll();
         var contextMenus = localStorage.getItem("contextMenus");
@@ -196,7 +200,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 });
 
-chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
+chrome.downloads.onDeterminingFilename.addListener(function(downloadItem) {
     var integration = localStorage.getItem("integration");
     if (integration == "true" && isCapture(downloadItem)) {
         function cancelDownloadandstartAria() {
@@ -262,9 +266,9 @@ chrome.webRequest.onHeadersReceived.addListener(function(details){
 
 },{urls: ["<all_urls>"]}, ["blocking","responseHeaders"]);
 */
-chrome.browserAction.onClicked.addListener(function () {
+chrome.browserAction.onClicked.addListener(function() {
     var index = chrome.extension.getURL('yaaw/index.html');
-    chrome.tabs.getAllInWindow(undefined, function (tabs) {
+    chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
             if (tab.url && tab.url == index) {
                 chrome.tabs.update(tab.id, { selected: true });
