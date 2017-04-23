@@ -105,8 +105,11 @@ function aria2Send(link, url, output) {
                 "header": header
             }]
         };
-        if (output)
+        if (output){
+            rpc_data.params[1]["dir"] = output.dir;
             rpc_data.params[1]["out"] = output.filename;
+        }
+            
         var result = parse_url(url);
         var auth = result[1];
         if (auth && auth.indexOf('token:') == 0) {
@@ -199,21 +202,24 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
         function cancelDownloadandstartAria() {
             chrome.downloads.search({ id: downloadItem.id }, function (downloadItems) {
                 downloadItem = downloadItems.pop();
-                if (downloadItem.bytesReceived > 0) {
+                if (downloadItem.filename)
                     chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
+                        if (chrome.runtime.lastError)
+                            iconUrl = "images/icon.jpg";
                         var rpc_list = JSON.parse(localStorage.getItem("rpc_list") || defaultRPC);
+                        var dirAndName = decodeURIComponent(downloadItem.filename).split(/[\/\\]/);
                         aria2Send(downloadItem.url, rpc_list[0]['url'], {
-                            "filename": decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
+                            "filename": dirAndName.pop(),
+                            "dir": dirAndName.join("/"),
                             "icon": iconUrl || "images/icon.jpg",
                             "id": downloadItem.id
                         });
+                        chrome.downloads.cancel(downloadItem.id, function () {
+                            chrome.downloads.erase({ id: downloadItem.id });
+                        });
                     });
-                    chrome.downloads.cancel(downloadItem.id, function () {
-                        chrome.downloads.erase({ id: downloadItem.id });
-                    });
-                } else {
+                else
                     setTimeout(cancelDownloadandstartAria, 500);
-                }
             });
         };
         setTimeout(cancelDownloadandstartAria, 500);
