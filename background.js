@@ -125,8 +125,12 @@ function aria2Send(link, url, output) {
                 var opt = {
                     type: "basic",
                     title: "开始下载",
-                    message: output.filename || "导出下载成功~",
-                    iconUrl: output.icon || "images/icon.jpg"
+                    message: "导出下载成功~",
+                    iconUrl: "images/icon.jpg"
+                }
+                if (output){
+                    opt["message"] = output.filename || "导出下载成功~";
+                    opt["iconUrl"] = output.icon || "images/icon.jpg";
                 }
                 var id = new Date().getTime().toString();
                 showNotification(id, opt);
