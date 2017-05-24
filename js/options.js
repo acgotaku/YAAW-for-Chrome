@@ -43,8 +43,10 @@ $(function(){
                     self.save();
                 });
                 $("#reset").on("click",function(){
-                    localStorage.clear();
-                    location.reload();
+                    if (window.confirm('Confirm reset?')) {
+                        localStorage.clear();
+                        location.reload();
+                    }
                 });
             },
             save:function(){
@@ -77,7 +79,7 @@ $(function(){
                 localStorage.setItem("white_site", JSON.stringify(white_site));
             }
         };
-    })();  
+    })();
     config.init();
 });
 
