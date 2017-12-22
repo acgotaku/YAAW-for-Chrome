@@ -17,11 +17,13 @@
 
 
 # Install
-作为chrome扩展安装即可.
-
-Web Store link : 
+作为chrome扩展安装：
 
 https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc
+
+作为Firefox扩展安装：
+
+https://addons.mozilla.org/en-US/firefox/addon/baidu-pan-exporter/
 
 
 License
