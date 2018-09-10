@@ -122,8 +122,8 @@ function aria2Send(link, url, output) {
                 var opt = {
                     type: "basic",
                     title: "开始下载",
-                    message: output.filename || "导出下载成功~",
-                    iconUrl: output.icon || "images/icon.jpg"
+                    message: output ? output.filename : "导出下载成功~",
+                    iconUrl: output ? output.icon : "images/icon.jpg"
                 }
                 var id = new Date().getTime().toString();
                 showNotification(id, opt);
@@ -277,7 +277,7 @@ if (previousVersion == "" || previousVersion != manifest.version) {
     var opt = {
         type: "basic",
         title: "更新",
-        message: "YAAW for Chrome更新到" + manifest.version + "版本啦～\n此次更新支持通配符匹配~",
+        message: "YAAW for Chrome更新到" + manifest.version + "版本啦～\n此次更新修复通知错误的BUG~",
         iconUrl: "images/icon.jpg"
     };
     var id = new Date().getTime().toString();
