@@ -1,0 +1,3 @@
+[submodule "yaaw"]
+	path = yaaw
+	url = https://github.com/binux/yaaw
