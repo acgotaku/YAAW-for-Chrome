@@ -1,4 +1,6 @@
 {
   "extends": "standard",
-  "plugins": ["standard"]
+  "env": {
+    "browser": true
+  }
 }

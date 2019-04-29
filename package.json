@@ -6,10 +6,12 @@
   "scripts": {
     "start": "npm run dev",
     "dev": "NODE_ENV=development gulp serve",
-    "build": "NODE_ENV=production gulp public",
+    "build": "NODE_ENV=production gulp publish",
     "clean": "gulp clean",
     "lint:js": "gulp lint:js",
     "lint:css": "gulp lint:css",
+    "eslint:fix": "eslint --fix src",
+    "stylelint:fix": "stylefmt -r \"src/**/*.scss\" && stylelint \"src/**/*.scss\" -s scss",
     "test": "npm run lint:js && npm run lint:css"
   },
   "repository": {
@@ -26,13 +28,36 @@
     "url": "https://github.com/acgotaku/YAAW-for-Chrome/issues"
   },
   "homepage": "https://github.com/acgotaku/YAAW-for-Chrome#readme",
-  "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/register": "^7.4.4",
+    "autoprefixer": "^9.5.1",
+    "del": "^4.1.1",
     "eslint": "^5.10.0",
     "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^8.0.0",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "gulp": "^4.0.1",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rollup-each": "^3.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-stylelint": "^9.0.0",
+    "gulp-uglify": "^3.0.2",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "stylefmt": "^6.0.3",
+    "stylelint": "^10.0.1",
+    "stylelint-config-sass-guidelines": "^6.0.0",
+    "stylelint-order": "^3.0.0",
+    "stylelint-scss": "^3.6.0"
   }
 }
