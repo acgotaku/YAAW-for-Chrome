@@ -1,3 +1,71 @@
+import Vue from 'vue/dist/vue.esm.js'
+
+Vue.config.productionTip = false
+
+const vm = new Vue({
+  data () {
+    return {
+      isContextMenus: true,
+      isInterception: false,
+      isSync: false,
+      fileSize: null,
+      rpcLists: [{
+        name: 'ARIA2 RPC',
+        path: 'http://localhost:6800/jsonrpc'
+      }],
+      whitelist: '',
+      blocklist: ''
+    }
+  },
+  mounted () {
+    chrome.storage.sync.get(null, (items) => {
+      for (let key in items) {
+        this[key] = items[key]
+        chrome.storage.local.set({ key: items[key] }, () => {
+          console.log('chrome first local set: %s, %s', key, items[key])
+        })
+      }
+    })
+    chrome.storage.local.get(null, (items) => {
+      for (let key in items) {
+        this[key] = items[key]
+      }
+    })
+  },
+  methods: {
+    addRPCForm () {
+      this.rpcLists.push({
+        name: '',
+        path: ''
+      })
+    },
+    removeRPC (index) {
+      this.rpcLists.splice(index, 1)
+    },
+    save () {
+      const configData = this.$data
+      console.log(configData)
+      for (let key in configData) {
+        chrome.storage.local.set({ [key]: configData[key] }, () => {
+          console.log('chrome local set: %s, %s', key, configData[key])
+        })
+        if (configData['isSync'] === true) {
+          chrome.storage.sync.set({ [key]: configData[key] }, () => {
+            console.log('chrome sync set: %s, %s', key, configData[key])
+          })
+        }
+      }
+    },
+    clear () {
+      chrome.storage.sync.clear()
+      chrome.storage.local.clear()
+      location.reload()
+    }
+  }
+})
+
+vm.$mount('#app')
+
 // $(function () {
 //   var config = (function () {
 //     return {

@@ -12,12 +12,12 @@ import stylelint from 'gulp-stylelint'
 import postcss from 'gulp-postcss'
 import sass from 'gulp-sass'
 import autoprefixer from 'autoprefixer'
-import concat from 'gulp-concat'
 import cleanCSS from 'gulp-clean-css'
 
 import rollupEach from 'gulp-rollup-each'
 import rollupBabel from 'rollup-plugin-babel'
 import rollupResolve from 'rollup-plugin-node-resolve'
+import replace from 'rollup-plugin-replace'
 import rollupCommon from 'rollup-plugin-commonjs'
 import uglify from 'gulp-uglify'
 
@@ -96,7 +96,6 @@ export function styles() {
         browsers: ['last 1 versions']
       })
     ]))
-    .pipe(concat('style.css'))
     .pipe(gulpIf(config.env.prod, cleanCSS()))
     .pipe(gulp.dest(paths.styles.dest), { sourcemaps: config.env.dev })
 }
@@ -115,7 +114,11 @@ export function scripts() {
         rollupResolve({
           browser: true
         }),
-        rollupCommon()
+        rollupCommon(),
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('development'),
+          'process.env.VUE_ENV': JSON.stringify('browser')
+        })
       ]},
       {
         format: 'iife'

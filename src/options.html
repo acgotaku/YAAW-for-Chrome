@@ -10,60 +10,80 @@
     <link href="css/options.css" rel="stylesheet" />
   </head>
   <body>
-    <nav class="navbar">
+    <div id="app">
+      <nav class="navbar">
+          <div class="container">
+            <div class="logo"></div>
+          </div>
+      </nav>
       <div class="container">
-        <div id="logo"></div>
+        <div class="form-horizontal">
+          <fieldset>
+            <legend>YAAW for Chrome Settings</legend>
+            <div class="control-group">
+              <label class="control-label" for="contextMenus">右键菜单</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="contextMenus" v-model="isContextMenus">
+                  选中即可开启右键菜单
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="syncConfig">配置同步</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="syncConfig" v-model="isSync">
+                  多设备自动云同步
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="interception">下载拦截</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="interception" v-model="isInterception" class="interception">
+                  文件下载会被导入到Aria2c &nbsp;&nbsp;&nbsp;  文件大小 &gt;=
+                  <input type="text" class="input-small"  placeholder="File Size" v-model="fileSize">
+                  （单位：M）
+                </label>
+              </div>
+            </div>
+            <div class="control-group" v-for="(rpc, index) in rpcLists">
+              <div class="control-group-inner">
+                <input type="text" class="input-small" placeholder="RPC Name" v-model="rpc.name">
+              </div>
+              <div class="controls">
+                <input type="text" class="input-xlarge" placeholder="RPC Path" v-model="rpc.path">
+                <button class="btn btn-rpc" @click="addRPCForm" v-if="index === 0">Add RPC</button>
+                <button class="btn btn-rpc btn-danger" @click="removeRPC(index)" v-else>Remove RPC</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="whitelist">网站白名单</label>
+              <div class="controls">
+                <textarea rows="6" id="whitelist" v-model="whitelist"></textarea>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="blocklist">网站黑名单</label>
+              <div class="controls">
+                <textarea rows="6" id="blocklist" v-model="blocklist"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </div>
       </div>
-    </nav>
-    <div class="container">
-      <div class="form-horizontal">
-        <fieldset>
-          <legend>YAAW for Chrome Settings</legend>
-          <div class="control-group">
-            <label class="control-label" for="contextMenus">右键菜单</label>
-            <div class="controls">
-              <label class="checkbox">
-                <input type="checkbox" id="contextMenus">
-                选中即可开启右键菜单
-              </label>
+      <footer class="footer">
+        <div class="container">
+            <div class="modal-footer">
+              <div class="copyright">© Copyright <a href="https://github.com/acgotaku/YAAW-for-Chrome" target="_blank">雪月秋水</a></div>
+              <button type="btn" class="btn btn-success" @click="save">Save</button>
+              <button class="btn" @click="clear">Reset</button>
             </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="integration">下载拦截</label>
-            <div class="controls">
-              <label class="checkbox">
-                <input type="checkbox" id="integration">
-                文件下载会被导入到Aria2c &nbsp;&nbsp;&nbsp;  File Size &gt;=
-                <input type="text" class="input-small"  placeholder="File Size" id="fileSize">
-                （单位：M）
-              </label>
-
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="white-site">网站白名单</label>
-            <div class="controls">
-              <textarea rows="6" id="white-site"></textarea>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="black-site">网站黑名单</label>
-            <div class="controls">
-              <textarea rows="6" id="black-site"></textarea>
-            </div>
-          </div>
-        </fieldset>
-      </div>
+        </div>
+      </footer>
     </div>
-    <footer class="footer">
-      <div class="container">
-          <div class="modal-footer">
-            <div id="copyright">© Copyright <a href="https://github.com/acgotaku/YAAW-for-Chrome">雪月秋水</a></div>
-            <button type="btn" class="btn btn-success" id="save">Save</button>
-            <button class="btn" id="reset">Reset</button>
-          </div>
-      </div>
-    </footer>
     <script src="yaaw/js/jquery-1.7.2.min.js"></script>
     <script src="yaaw/js/bootstrap.min.js"></script>
     <script src="js/options.js"></script>

@@ -3,13 +3,16 @@ html {
   height: 100%;
 }
 
-.copyright {
-  float: left;
-  margin-top: 10px;
+textarea {
+  width: 45%;
+}
+
+fieldset {
+  margin-bottom: 50px;
 }
 
 .logo {
-  background-image: url('images/logo128.png');
+  background-image: url('../images/logo128.png');
   background-size: 128px 128px;
   height: 128px;
   margin-left: 100px;
@@ -24,11 +27,21 @@ html {
   z-index: 200;
 }
 
+.control-group-inner {
+  float: left;
+  text-align: right;
+  width: 140px;
+}
+
+.controls .interception {
+  margin-top: 6px;
+}
+
 legend {
   margin-bottom: 0;
 }
 
-.rpc-path {
+.btn-rpc {
   margin-left: 10px;
 }
 
@@ -44,10 +57,7 @@ legend {
   width: 100%;
 }
 
-textarea {
-  width: 45%;
-}
-
-fieldset {
-  margin-bottom: 50px;
+.copyright {
+  float: left;
+  margin-top: 10px;
 }
