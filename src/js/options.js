@@ -44,7 +44,6 @@ const vm = new Vue({
     },
     save () {
       const configData = this.$data
-      console.log(configData)
       for (let key in configData) {
         chrome.storage.local.set({ [key]: configData[key] }, () => {
           console.log('chrome local set: %s, %s', key, configData[key])
@@ -55,11 +54,19 @@ const vm = new Vue({
           })
         }
       }
+      this.showSavedInfo()
     },
     clear () {
       chrome.storage.sync.clear()
       chrome.storage.local.clear()
       location.reload()
+    },
+    showSavedInfo () {
+      const info = document.querySelector('.config-saved')
+      info.classList.add('show')
+      setTimeout(() => {
+        info.classList.remove('show')
+      }, 3000)
     }
   }
 })

@@ -178,8 +178,15 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status === 'loading') {
     chrome.contextMenus.removeAll()
     getConfig('isContextMenus').then(({ isContextMenus }) => {
-      if (isContextMenus) {
+      console.log(isContextMenus)
+      if (isContextMenus !== false) {
         getConfig('rpcLists').then(({ rpcLists }) => {
+          if(!rpcLists) {
+            rpcLists = [{
+              name: 'ARIA2 RPC',
+              path: defaultRPC
+            }]
+          }
           rpcLists.forEach(rpcItem => {
             addContextMenu(rpcItem['path'], rpcItem['name'])
           })

@@ -27,6 +27,17 @@ fieldset {
   z-index: 200;
 }
 
+.config-saved {
+  color: #28a745;
+  float: right;
+  font-size: 12px;
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
 .control-group-inner {
   float: left;
   text-align: right;
