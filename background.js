@@ -1,53 +1,24 @@
-const defaultRPC = '[{"name":"ARIA2 RPC","url":"http://localhost:6800/jsonrpc"}]'
-var HttpSendRead = function (info) {
-  Promise.prototype.done = Promise.prototype.then
-  Promise.prototype.fail = Promise.prototype.catch
-  return new Promise(function (resolve, reject) {
-    var http = new XMLHttpRequest()
-    var contentType = '\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002f\u0078\u002d\u0077\u0077\u0077\u002d\u0066\u006f\u0072\u006d\u002d\u0075\u0072\u006c\u0065\u006e\u0063\u006f\u0064\u0065\u0064\u003b\u0020\u0063\u0068\u0061\u0072\u0073\u0065\u0074\u003d\u0055\u0054\u0046\u002d\u0038'
-    var timeout = 3000
-    if (info.contentType != null) {
-      contentType = info.contentType
-    }
-    if (info.timeout != null) {
-      timeout = info.timeout
-    }
-    var timeId = setTimeout(httpclose, timeout)
+const defaultRPC = 'http://localhost:6800/jsonrpc'
 
-    function httpclose () {
-      http.abort()
-    }
-    http.onreadystatechange = function () {
-      if (http.readyState == 4) {
-        if ((http.status == 200 && http.status < 300) || http.status == 304) {
-          clearTimeout(timeId)
-          if (info.dataType == 'json') {
-            resolve(JSON.parse(http.responseText), http.status, http)
-          } else if (info.dataType == 'SCRIPT') {
-            // eval(http.responseText);
-            resolve(http.responseText, http.status, http)
-          }
-        } else {
-          clearTimeout(timeId)
-          reject(http, http.statusText, http.status)
-        }
-      }
-    }
-    http.open(info.type, info.url, true)
-    http.setRequestHeader('Content-type', contentType)
-    for (h in info.headers) {
-      if (info.headers[h]) {
-        http.setRequestHeader(h, info.headers[h])
-      }
-    }
-    if (info.type == 'POST') {
-      http.send(info.data)
+const httpSend = ({url, options}, resolve, reject) => {
+  fetch(url, options).then((response) => {
+    if (response.ok) {
+      response.json().then((data) => {
+        resolve(data)
+      })
     } else {
-      http.send()
+      reject(response)
     }
+  }).catch((err) => {
+    reject(err)
   })
 }
 
+const getConfig = (key) => {
+  return new Promise(function(resolve) {
+    chrome.storage.local.get(key, resolve)
+  })
+}
 // 生成右键菜单
 function addContextMenu (id, title) {
   chrome.contextMenus.create({
@@ -65,79 +36,96 @@ function showNotification (id, opt) {
     chrome.notifications.clear(id, function () {})
   }, 3000)
 }
-// 解析RPC地址
-function parse_url (url) {
-  var auth_str = request_auth(url)
-  var auth = null
-  if (auth_str) {
-    if (auth_str.indexOf('token:') == 0) {
-      auth = auth_str
-    } else {
-      auth = 'Basic ' + btoa(auth_str)
+// 解析 RPC地址 返回验证数据 和地址
+function parseURL (url) {
+  const parseURL = new URL(url)
+  let authStr = parseURL.username ? `${parseURL.username}:${decodeURI(parseURL.password)}` : null
+  if (authStr) {
+    if (!authStr.includes('token:')) {
+      authStr = `Basic ${btoa(authStr)}`
     }
   }
-  var url_path = remove_auth(url)
-
-  function request_auth (url) {
-    return url.match(/^(?:(?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1]
+  const paramsString = parseURL.hash.substr(1)
+  let options = {}
+  const searchParams = new URLSearchParams(paramsString)
+  for (let key of searchParams) {
+    options[key[0]] = key.length === 2 ? key[1] : 'enabled'
   }
-
-  function remove_auth (url) {
-    return url.replace(/^((?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3')
-  }
-  return [url_path, auth]
+  const path = parseURL.origin + parseURL.pathname
+  return {authStr, path, options}
 }
 
-function aria2Send (link, url, output) {
-  chrome.cookies.getAll({ 'url': link }, function (cookies) {
-    var format_cookies = []
-    for (var i in cookies) {
-      var cookie = cookies[i]
-      format_cookies.push(cookie.name + '=' + cookie.value)
+function generateParameter (authStr, path, data) {
+  if (authStr && authStr.startsWith('token')) {
+    data.params.unshift(authStr)
+  }
+  const parameter = {
+    url: path,
+    options: {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      },
+      body: JSON.stringify(data)
     }
-    var header = []
-    header.push('Cookie: ' + format_cookies.join('; '))
+  }
+  if (authStr && authStr.startsWith('Basic')) {
+    parameter.options.headers['Authorization'] = authStr
+  }
+  return parameter
+}
+function aria2Send (rpcPath, fileDownloadInfo) {
+  const {authStr, path, options} = parseURL(rpcPath)
+  chrome.cookies.getAll({ 'url': fileDownloadInfo.link }, function (cookies) {
+    const formatedCookies = []
+    cookies.forEach(cookie => {
+      formatedCookies.push(cookie.name + '=' + cookie.value)
+    })
+    const header = []
+    header.push('Cookie: ' + formatedCookies.join('; '))
     header.push('User-Agent: ' + navigator.userAgent)
-    header.push('Connection: keep-alive')
-    var rpc_data = {
+
+    const rpcData = {
       'jsonrpc': '2.0',
       'method': 'aria2.addUri',
       'id': new Date().getTime(),
       'params': [
-        [link], {
+        [fileDownloadInfo.link], {
           'header': header
         }
       ]
     }
-    if (output) { rpc_data.params[1]['out'] = output.filename }
-    var result = parse_url(url)
-    var auth = result[1]
-    if (auth && auth.indexOf('token:') == 0) {
-      rpc_data.params.unshift(auth)
+    const rpcOption = rpcData.params[1]
+    if(fileDownloadInfo.fileName) {
+      rpcOption['out'] = fileDownloadInfo.fileName
     }
-    var parameter = { 'url': result[0], 'dataType': 'json', type: 'POST', data: JSON.stringify(rpc_data), 'headers': { 'Authorization': auth } }
-    HttpSendRead(parameter)
-      .done(function (json, textStatus, jqXHR) {
-        var opt = {
-          type: 'basic',
-          title: '开始下载',
-          message: output ? output.filename : '导出下载成功~',
-          iconUrl: output ? output.icon : 'images/icon.jpg'
-        }
-        var id = new Date().getTime().toString()
-        showNotification(id, opt)
-      })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR)
-        var opt = {
-          type: 'basic',
-          title: '下载失败',
-          message: '导出下载失败! QAQ',
-          iconUrl: 'images/icon.jpg'
-        }
-        var id = new Date().getTime().toString()
-        showNotification(id, opt)
-      })
+    if (options) {
+      for (let key in options) {
+        rpcOption[key] = options[key]
+      }
+    }
+    const parameter = generateParameter(authStr, path, rpcData)
+
+    httpSend(parameter, () => {
+      const opt = {
+        type: 'basic',
+        title: '开始下载',
+        message: fileDownloadInfo.fileName ? fileDownloadInfo.fileName : '导出下载成功~',
+        iconUrl: fileDownloadInfo.icon ? fileDownloadInfo.icon : 'images/icon.jpg'
+      }
+      const id = new Date().getTime().toString()
+      showNotification(id, opt)
+    }, (error) => {
+      console.log(error)
+      const opt = {
+        type: 'basic',
+        title: '下载失败',
+        message: '导出下载失败! QAQ',
+        iconUrl: 'images/icon.jpg'
+      }
+      const id = new Date().getTime().toString()
+      showNotification(id, opt)
+    })
   })
 }
 
@@ -145,29 +133,33 @@ function matchRule (str, rule) {
   return new RegExp('^' + rule.split('*').join('.*') + '$').test(str)
 }
 
-function isCapture (downloadItem) {
-  var fileSize = localStorage.getItem('fileSize')
-  var white_site = JSON.parse(localStorage.getItem('white_site'))
-  var black_site = JSON.parse(localStorage.getItem('black_site'))
-  var url = downloadItem.referrer || downloadItem.url
+async function isCapture (downloadItem) {
+  const { fileSize } = await getConfig('fileSize')
+  const { whitelist } = await getConfig('whitelist')
+  const { blocklist } = await getConfig('blocklist')
+  const url = downloadItem.referrer || downloadItem.url
 
   if (downloadItem.error || downloadItem.state != 'in_progress' || url.startsWith('http') == false) {
     return false
   }
 
-  var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
-  var result = parse_url.exec(url)[3]
+  const parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
+  const result = parse_url.exec(url)[3]
 
-  for (var i = 0; i < white_site.length; i++) {
-    if (matchRule(result, white_site[i])) {
-      return true
-    }
+  const inWhitelist = whitelist.split('\n').some((site) => {
+    return matchRule(result, site)
+  })
+
+  if(inWhitelist) {
+    return true
   }
 
-  for (var i = 0; i < black_site.length; i++) {
-    if (matchRule(result, black_site[i])) {
-      return false
-    }
+  const inBlocklist = blocklist.split('\n').some((site) => {
+    return matchRule(result, site)
+  })
+
+  if(inBlocklist) {
+    return false
   }
 
   if (downloadItem.fileSize >= fileSize * 1024 * 1024) {
@@ -177,85 +169,54 @@ function isCapture (downloadItem) {
   }
 }
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
-  aria2Send(info.linkUrl, info.menuItemId, null)
+  aria2Send(info.menuItemId, {
+    link: info.linkUrl
+  })
 })
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status === 'loading') {
     chrome.contextMenus.removeAll()
-    var contextMenus = localStorage.getItem('contextMenus')
-    if (contextMenus == 'true' || contextMenus == null) {
-      var rpc_list = JSON.parse(localStorage.getItem('rpc_list') || defaultRPC)
-      for (var i in rpc_list) {
-        addContextMenu(rpc_list[i]['url'], rpc_list[i]['name'])
+    getConfig('isContextMenus').then(({ isContextMenus }) => {
+      if (isContextMenus) {
+        getConfig('rpcLists').then(({ rpcLists }) => {
+          rpcLists.forEach(rpcItem => {
+            addContextMenu(rpcItem['path'], rpcItem['name'])
+          })
+        })
       }
-      localStorage.setItem('contextMenus', true)
-    }
+    })
   }
 })
 
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
-  var integration = localStorage.getItem('integration')
-  if (integration == 'true' && isCapture(downloadItem)) {
-    console.log(chrome.runtime.lastError)
-    setTimeout(function () {
-      chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
-        if (chrome.runtime.lastError) {
-          console.log(chrome.runtime.lastError.message)
-        }
-        var rpc_list = JSON.parse(localStorage.getItem('rpc_list') || defaultRPC)
-        // console.log(decodeURIComponent(downloadItem.filename));
-        aria2Send(downloadItem.url, rpc_list[0]['url'], {
-          'filename': decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
-          'icon': iconUrl || 'images/icon.jpg',
-          'id': downloadItem.id
+  getConfig('interception').then(({ interception }) => {
+    if (interception && isCapture(downloadItem)) {
+      setTimeout(function () {
+        chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
+          if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError.message)
+          }
+          getConfig('rpcLists').then(({ rpcLists }) => {
+            // var rpc_list = JSON.parse(localStorage.getItem('rpc_list') || defaultRPC)
+            aria2Send(downloadItem.url, rpcLists[0]['url'], {
+              'filename': decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
+              'icon': iconUrl || 'images/icon.jpg',
+              'id': downloadItem.id
+            })
+            chrome.downloads.cancel(downloadItem.id, function () {})
+            chrome.downloads.erase({ id: downloadItem.id })
+          })
         })
-      })
-      chrome.downloads.cancel(downloadItem.id, function () {})
-      chrome.downloads.erase({ id: downloadItem.id })
-    }, 500)
-  }
+      }, 500)
+    }
+  })
 })
 
-/*
-chrome.webRequest.onHeadersReceived.addListener(function(details){
-    for (var i = 0; i < details.responseHeaders.length; ++i) {
-        if (details.responseHeaders[i].name === 'Content-Type' && details.responseHeaders[i].value === 'application/octet-stream') {
-            var item = details.responseHeaders;
-            var flag = 0;
-            var downloadItem ={url:null,name:null,fileSize:0};
-            item.filter(function(obj){
-                if(obj.name === 'Content-Length' && obj.value == 0){
-                    flag++;
-                }
-                if(obj.name === 'Content-Transfer-Encoding' || obj.name == 'Transfer-Encoding'|| obj.name == 'Content-Encoding'){
-                    flag++;
-                }
-                if(obj.name === 'Content-Disposition'){
-                    downloadItem.name= decodeURIComponent(obj.value.split("=")[1]);
-                }
-                if(obj.name === 'Content-Length'){
-                    downloadItem.fileSize= obj.value;
-                }
-            });
-            if(!flag){
-                downloadItem.url = details.url;
-                var integration =localStorage.getItem("integration");
-                if(integration == "true" && isCapture(downloadItem)){
-                    var rpc_list=JSON.parse(localStorage.getItem("rpc_list")||defaultRPC);
-                    aria2Send(downloadItem.url,rpc_list[0]['url'],null);
-                }
-                return {cancel: true};
-            }
-        }
-    }
-
-},{urls: ["<all_urls>"]}, ["blocking","responseHeaders"]);
-*/
 chrome.browserAction.onClicked.addListener(function () {
-  var index = chrome.extension.getURL('yaaw/index.html')
+  const index = chrome.extension.getURL('yaaw/index.html')
   chrome.tabs.getAllInWindow(undefined, function (tabs) {
-    for (var i = 0, tab; tab = tabs[i]; i++) {
+    for (let i = 0, tab; tab = tabs[i]; i++) {
       if (tab.url && tab.url == index) {
         chrome.tabs.update(tab.id, { selected: true })
         return
@@ -266,16 +227,20 @@ chrome.browserAction.onClicked.addListener(function () {
 })
 
 // 软件版本更新提示
-var manifest = chrome.runtime.getManifest()
-var previousVersion = localStorage.getItem('version')
+const manifest = chrome.runtime.getManifest()
+const previousVersion = localStorage.getItem('version')
 if (previousVersion == '' || previousVersion != manifest.version) {
-  var opt = {
+  const opt = {
     type: 'basic',
     title: '更新',
     message: 'YAAW for Chrome更新到' + manifest.version + '版本啦～\n此次更新修复通知错误的BUG~',
     iconUrl: 'images/icon.jpg'
   }
-  var id = new Date().getTime().toString()
+  const id = new Date().getTime().toString()
   showNotification(id, opt)
   localStorage.setItem('version', manifest.version)
+}
+
+if(!localStorage.getItem('jsonrpc_path')) {
+  localStorage.setItem('jsonrpc_path', defaultRPC)
 }

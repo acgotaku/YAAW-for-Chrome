@@ -8,7 +8,7 @@ const vm = new Vue({
       isContextMenus: true,
       isInterception: false,
       isSync: false,
-      fileSize: null,
+      fileSize: 0,
       rpcLists: [{
         name: 'ARIA2 RPC',
         path: 'http://localhost:6800/jsonrpc'
