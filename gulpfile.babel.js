@@ -3,6 +3,8 @@ import gulp from 'gulp'
 import plumber from 'gulp-plumber'
 import gulpIf from 'gulp-if'
 
+import htmlhint from 'gulp-htmlhint'
+
 import eslint from 'gulp-eslint'
 import stylelint from 'gulp-stylelint'
 
@@ -19,9 +21,17 @@ import rollupResolve from 'rollup-plugin-node-resolve'
 import rollupCommon from 'rollup-plugin-commonjs'
 import uglify from 'gulp-uglify'
 
+import imagemin from 'gulp-imagemin'
+import mozjpeg from 'imagemin-mozjpeg'
+import pngquant from 'imagemin-pngquant'
+
 import del from 'del'
 
 const paths = {
+  htmls: {
+    src: 'src/**/*.html',
+    dest: 'dist/'
+  },
   styles: {
     src: 'src/css/**/*.scss',
     dest: 'dist/css/'
@@ -33,6 +43,10 @@ const paths = {
   images: {
     src: 'src/images/**/*',
     dest: 'dist/images/'
+  },
+  copys: {
+    src: ['_locales/**/*', 'yaaw/**/*', 'background.js', 'manifest.json'],
+    dest: 'dist/'
   }
 }
 
@@ -43,6 +57,11 @@ const config = {
       this.emit('end')
     }
   },
+  htmlhintConfig: {
+    'alt-require': true,
+    'attr-lowercase': ['viewBox', 'textLength'],
+    'title-require': false
+  },
   env: {
     dev: process.env.NODE_ENV === 'development',
     prod: process.env.NODE_ENV === 'production'
@@ -50,6 +69,14 @@ const config = {
 }
 
 export const clean = () => del([ 'dist' ])
+
+export function htmls() {
+  return gulp.src(paths.htmls.src)
+    .pipe(plumber(config.plumberConfig))
+    .pipe(htmlhint(config.htmlhintConfig))
+    .pipe(htmlhint.reporter())
+    .pipe(gulp.dest(paths.htmls.dest))
+}
 
 export function styles() {
   return gulp.src(paths.styles.src, { sourcemaps: config.env.dev })
@@ -98,11 +125,31 @@ export function scripts() {
     .pipe(gulp.dest(paths.scripts.dest), { sourcemaps: config.env.dev })
 }
 
+export function images() {
+  return gulp.src(paths.images.src)
+    .pipe(plumber(config.plumberConfig))
+    .pipe(imagemin([
+      pngquant(),
+      mozjpeg()
+    ], {
+      verbose: true
+    }))
+    .pipe(gulp.dest(paths.images.dest))
+}
+
+export function copys() {
+  return gulp.src(paths.copys.src, { base: '.' })
+    .pipe(gulp.dest(paths.copys.dest))
+}
+
 export function watch() {
+  gulp.watch(paths.htmls.src, htmls)
   gulp.watch(paths.scripts.src, scripts)
   gulp.watch(paths.styles.src, styles)
+  gulp.watch(paths.copys.src, copys)
 }
-export const build = gulp.parallel(styles, scripts)
+
+export const build = gulp.parallel(htmls, styles, scripts, images, copys)
 
 export const serve = gulp.series(clean, build, watch)
 
