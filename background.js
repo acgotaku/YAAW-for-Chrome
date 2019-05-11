@@ -1,6 +1,6 @@
 const defaultRPC = 'http://localhost:6800/jsonrpc'
 
-const httpSend = ({url, options}, resolve, reject) => {
+const httpSend = ({ url, options }, resolve, reject) => {
   fetch(url, options).then((response) => {
     if (response.ok) {
       response.json().then((data) => {
@@ -15,7 +15,7 @@ const httpSend = ({url, options}, resolve, reject) => {
 }
 
 const getConfig = (key) => {
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     chrome.storage.local.get(key, resolve)
   })
 }
@@ -27,9 +27,35 @@ function addContextMenu (id, title) {
     contexts: ['link']
   })
 }
+
+function updateContextMenu () {
+  chrome.contextMenus.removeAll(() => {
+    getConfig('isContextMenus').then(({ isContextMenus }) => {
+      if (isContextMenus !== false) {
+        getConfig('rpcLists').then(({ rpcLists }) => {
+          if (!rpcLists) {
+            rpcLists = [{
+              name: 'ARIA2 RPC',
+              path: defaultRPC
+            }]
+          }
+          rpcLists.forEach(rpcItem => {
+            addContextMenu(rpcItem['path'], rpcItem['name'])
+          })
+        })
+      }
+    })
+  })
+}
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+  if (changes.rpcLists) {
+    updateContextMenu()
+  }
+})
+
 // 弹出chrome通知
 function showNotification (id, opt) {
-  var notification = chrome.notifications.create(id, opt, function (notifyId) {
+  chrome.notifications.create(id, opt, function (notifyId) {
     return notifyId
   })
   setTimeout(function () {
@@ -52,7 +78,7 @@ function parseURL (url) {
     options[key[0]] = key.length === 2 ? key[1] : 'enabled'
   }
   const path = parseURL.origin + parseURL.pathname
-  return {authStr, path, options}
+  return { authStr, path, options }
 }
 
 function generateParameter (authStr, path, data) {
@@ -75,7 +101,7 @@ function generateParameter (authStr, path, data) {
   return parameter
 }
 function aria2Send (rpcPath, fileDownloadInfo) {
-  const {authStr, path, options} = parseURL(rpcPath)
+  const { authStr, path, options } = parseURL(rpcPath)
   chrome.cookies.getAll({ 'url': fileDownloadInfo.link }, function (cookies) {
     const formatedCookies = []
     cookies.forEach(cookie => {
@@ -96,7 +122,7 @@ function aria2Send (rpcPath, fileDownloadInfo) {
       ]
     }
     const rpcOption = rpcData.params[1]
-    if(fileDownloadInfo.fileName) {
+    if (fileDownloadInfo.fileName) {
       rpcOption['out'] = fileDownloadInfo.fileName
     }
     if (options) {
@@ -104,27 +130,33 @@ function aria2Send (rpcPath, fileDownloadInfo) {
         rpcOption[key] = options[key]
       }
     }
-    const parameter = generateParameter(authStr, path, rpcData)
+    getConfig('downloadPath').then(({ downloadPath }) => {
+      if (downloadPath) {
+        rpcOption['dir'] = downloadPath
+      }
 
-    httpSend(parameter, () => {
-      const opt = {
-        type: 'basic',
-        title: '开始下载',
-        message: fileDownloadInfo.fileName ? fileDownloadInfo.fileName : '导出下载成功~',
-        iconUrl: fileDownloadInfo.icon ? fileDownloadInfo.icon : 'images/icon.jpg'
-      }
-      const id = new Date().getTime().toString()
-      showNotification(id, opt)
-    }, (error) => {
-      console.log(error)
-      const opt = {
-        type: 'basic',
-        title: '下载失败',
-        message: '导出下载失败! QAQ',
-        iconUrl: 'images/icon.jpg'
-      }
-      const id = new Date().getTime().toString()
-      showNotification(id, opt)
+      const parameter = generateParameter(authStr, path, rpcData)
+
+      httpSend(parameter, () => {
+        const opt = {
+          type: 'basic',
+          title: '开始下载',
+          message: fileDownloadInfo.fileName ? fileDownloadInfo.fileName : '导出下载成功~',
+          iconUrl: fileDownloadInfo.icon ? fileDownloadInfo.icon : 'images/icon.jpg'
+        }
+        const id = new Date().getTime().toString()
+        showNotification(id, opt)
+      }, (error) => {
+        console.log(error)
+        const opt = {
+          type: 'basic',
+          title: '下载失败',
+          message: '导出下载失败! QAQ',
+          iconUrl: 'images/icon.jpg'
+        }
+        const id = new Date().getTime().toString()
+        showNotification(id, opt)
+      })
     })
   })
 }
@@ -134,7 +166,7 @@ function matchRule (str, rule) {
 }
 
 function getHostName (url) {
-  if(url.startsWith('http')) {
+  if (url.startsWith('http')) {
     return decodeURI(new URL(url).hostname)
   } else {
     return url
@@ -147,19 +179,18 @@ async function isCapture (downloadItem) {
   const { blocklist } = await getConfig('blocklist')
   const url = downloadItem.referrer || downloadItem.url
 
-  if (downloadItem.error || downloadItem.state != 'in_progress' || url.startsWith('http') == false) {
+  if (downloadItem.error || downloadItem.state !== 'in_progress' || url.startsWith('http') === false) {
     return false
   }
 
-  const target = getHostName(url);
+  const target = getHostName(url)
 
   const inWhitelist = whitelist.split('\n').some((site) => {
-
     const rule = getHostName(site)
     return matchRule(target, rule)
   })
 
-  if(inWhitelist) {
+  if (inWhitelist) {
     return true
   }
 
@@ -168,7 +199,7 @@ async function isCapture (downloadItem) {
     return matchRule(target, rule)
   })
 
-  if(inBlocklist) {
+  if (inBlocklist) {
     return false
   }
 
@@ -185,46 +216,25 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   })
 })
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (changeInfo.status === 'loading') {
-    chrome.contextMenus.removeAll()
-    getConfig('isContextMenus').then(({ isContextMenus }) => {
-      if (isContextMenus !== false) {
-        getConfig('rpcLists').then(({ rpcLists }) => {
-          if(!rpcLists) {
-            rpcLists = [{
-              name: 'ARIA2 RPC',
-              path: defaultRPC
-            }]
-          }
-          rpcLists.forEach(rpcItem => {
-            addContextMenu(rpcItem['path'], rpcItem['name'])
-          })
-        })
-      }
-    })
-  }
-})
-
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
   getConfig('isInterception').then(({ isInterception }) => {
     if (isInterception) {
       isCapture(downloadItem).then(result => {
-        if(result) {
+        if (result) {
           chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
             if (chrome.runtime.lastError) {
               console.log(chrome.runtime.lastError.message)
             }
             getConfig('rpcLists').then(({ rpcLists }) => {
-              if(!rpcLists) {
+              if (!rpcLists) {
                 rpcLists = [{
                   name: 'ARIA2 RPC',
                   path: defaultRPC
                 }]
               }
               aria2Send(rpcLists[0]['path'], {
-                'link': downloadItem.url,
-                'filename': decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
+                'link': downloadItem.finalUrl,
+                'filename': decodeURIComponent(downloadItem.filename).split(/[/\\]/).pop(),
                 'icon': iconUrl || 'images/icon.jpg'
               })
               chrome.downloads.cancel(downloadItem.id, function () {})
@@ -237,27 +247,32 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
   })
 })
 
-chrome.browserAction.onClicked.addListener(function () {
+function openYAAW () {
   const index = chrome.extension.getURL('yaaw/index.html')
   chrome.tabs.getAllInWindow(undefined, function (tabs) {
-    for (let i = 0, tab; tab = tabs[i]; i++) {
-      if (tab.url && tab.url == index) {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url === index) {
         chrome.tabs.update(tab.id, { selected: true })
-        return
       }
-    }
+    })
     chrome.tabs.create({ url: index })
   })
+}
+chrome.browserAction.onClicked.addListener(function () {
+  openYAAW()
 })
 
+chrome.notifications.onClicked.addListener(function () {
+  openYAAW()
+})
 // 软件版本更新提示
 const manifest = chrome.runtime.getManifest()
 const previousVersion = localStorage.getItem('version')
-if (previousVersion == '' || previousVersion != manifest.version) {
+if (previousVersion === '' || previousVersion !== manifest.version) {
   const opt = {
     type: 'basic',
     title: '更新',
-    message: 'YAAW for Chrome更新到' + manifest.version + '版本啦～\n此次更新修复通知错误的BUG~',
+    message: 'YAAW for Chrome更新到' + manifest.version + '版本啦～\n此次更新支持自定义下载路径',
     iconUrl: 'images/icon.jpg'
   }
   const id = new Date().getTime().toString()
@@ -265,6 +280,8 @@ if (previousVersion == '' || previousVersion != manifest.version) {
   localStorage.setItem('version', manifest.version)
 }
 
-if(!localStorage.getItem('jsonrpc_path')) {
+if (!localStorage.getItem('jsonrpc_path')) {
   localStorage.setItem('jsonrpc_path', defaultRPC)
 }
+
+updateContextMenu()

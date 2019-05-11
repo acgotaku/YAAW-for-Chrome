@@ -27,6 +27,8 @@ import pngquant from 'imagemin-pngquant'
 
 import del from 'del'
 
+import zip from 'gulp-zip'
+
 const paths = {
   htmls: {
     src: 'src/**/*.html',
@@ -46,6 +48,10 @@ const paths = {
   },
   copys: {
     src: ['_locales/**/*', 'yaaw/**/*', 'background.js', 'manifest.json'],
+    dest: 'dist/'
+  },
+  compress: {
+    src: 'dist/**/*',
     dest: 'dist/'
   }
 }
@@ -152,8 +158,13 @@ export function watch() {
   gulp.watch(paths.copys.src, copys)
 }
 
+export function compress() {
+  return gulp.src(paths.compress.src)
+    .pipe(zip('chrome.zip'))
+    .pipe(gulp.dest(paths.compress.dest))
+}
 export const build = gulp.parallel(htmls, styles, scripts, images, copys)
 
 export const serve = gulp.series(clean, build, watch)
 
-export const publish = gulp.series(clean, build)
+export const publish = gulp.series(clean, build, compress)

@@ -21,7 +21,7 @@
       "message": "sync config to Cloud"
    },
    "interception": {
-      "message": "download interception"
+      "message": "Download interception"
    },
    "interceptionDesc": {
       "message": "file download will be imported into Aria2c"
@@ -31,6 +31,12 @@
    },
    "unit": {
       "message": "unit"
+   },
+   "downloadPathStr": {
+      "message": "Download path"
+   },
+   "downloadPathDesc": {
+      "message": "only support absolute path"
    },
    "addRPC": {
       "message": "Add RPC"
@@ -52,5 +58,8 @@
    },
    "reset": {
       "message": "Reset"
+   },
+   "resetConfirm": {
+      "message": "Confirm reset?"
    }
 }

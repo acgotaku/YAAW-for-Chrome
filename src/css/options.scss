@@ -27,6 +27,17 @@ fieldset {
   z-index: 200;
 }
 
+.title {
+  display: inline-block;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.version {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
 .config-saved {
   color: #28a745;
   float: right;

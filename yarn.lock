@@ -3864,6 +3864,17 @@ gulp-uglify@^3.0.2:
     uglify-js "^3.0.5"
     vinyl-sourcemaps-apply "^0.2.0"
 
+gulp-zip@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/gulp-zip/-/gulp-zip-4.2.0.tgz#e25e738c41ad0795ad853d1d8aeb1744d2a4ca82"
+  integrity sha512-I+697f6jf+PncdTrqfuwoauxgnLG1yHRg3vlmvDgmJuEnlEHy4meBktJ/oHgfyg4tp6X25wuZqUOraVeVg97wQ==
+  dependencies:
+    get-stream "^3.0.0"
+    plugin-error "^0.1.2"
+    through2 "^2.0.1"
+    vinyl "^2.1.0"
+    yazl "^2.1.0"
+
 gulp@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/gulp/-/gulp-4.0.1.tgz#987a38a55a7d3677f6b49e291b06bc05809f33d9"
@@ -8559,7 +8570,7 @@ vinyl-sourcemaps-apply@0.2.1, vinyl-sourcemaps-apply@^0.2.0, vinyl-sourcemaps-ap
   dependencies:
     source-map "^0.5.1"
 
-vinyl@^2.0.0, vinyl@^2.2.0:
+vinyl@^2.0.0, vinyl@^2.1.0, vinyl@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/vinyl/-/vinyl-2.2.0.tgz#d85b07da96e458d25b2ffe19fece9f2caa13ed86"
   integrity sha512-MBH+yP0kC/GQ5GwBqrTPTzEfiiLjta7hTtvQtbxBgTeSXsmKQRQecjibMbxIXzVT3Y9KJK+drOz1/k+vsu8Nkg==
@@ -8725,3 +8736,10 @@ yauzl@^2.4.2:
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.1.0"
+
+yazl@^2.1.0:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/yazl/-/yazl-2.5.1.tgz#a3d65d3dd659a5b0937850e8609f22fffa2b5c35"
+  integrity sha512-phENi2PLiHnHb6QBVot+dJnaAZ0xosj7p3fWl+znIjBDlnMI2PsZCJZ306BPTFOaHf5qdDEI8x5qFrSOBN5vrw==
+  dependencies:
+    buffer-crc32 "~0.2.3"

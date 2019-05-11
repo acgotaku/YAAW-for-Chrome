@@ -32,6 +32,12 @@
    "unit": {
       "message": "单位"
    },
+   "downloadPathStr": {
+      "message": "下载路径"
+   },
+   "downloadPathDesc": {
+      "message": "只能设置为绝对路径"
+   },
    "addRPC": {
       "message": "添加RPC"
    },
@@ -52,5 +58,8 @@
    },
    "reset": {
       "message": "重置"
+   },
+   "resetConfirm": {
+      "message": "真的要重置么？"
    }
 }

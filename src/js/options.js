@@ -9,6 +9,7 @@ const vm = new Vue({
       isInterception: false,
       isSync: false,
       fileSize: 0,
+      downloadPath: '',
       rpcLists: [{
         name: 'ARIA2 RPC',
         path: 'http://localhost:6800/jsonrpc'
@@ -16,6 +17,7 @@ const vm = new Vue({
       whitelist: '',
       blocklist: '',
       saved: false,
+      version: chrome.runtime.getManifest().version,
       title: chrome.i18n.getMessage('title'),
       contextMenu: chrome.i18n.getMessage('contextMenu'),
       contextMenuDesc: chrome.i18n.getMessage('contextMenuDesc'),
@@ -25,6 +27,8 @@ const vm = new Vue({
       interceptionDesc: chrome.i18n.getMessage('interceptionDesc'),
       fileSizeStr: chrome.i18n.getMessage('fileSizeStr'),
       unit: chrome.i18n.getMessage('unit'),
+      downloadPathStr: chrome.i18n.getMessage('downloadPathStr'),
+      downloadPathDesc: chrome.i18n.getMessage('downloadPathDesc'),
       addRPC: chrome.i18n.getMessage('addRPC'),
       removeRPC: chrome.i18n.getMessage('removeRPC'),
       whitelistStr: chrome.i18n.getMessage('whitelistStr'),
@@ -65,6 +69,7 @@ const vm = new Vue({
         isInterception: this.isInterception,
         isSync: this.isSync,
         fileSize: this.fileSize,
+        downloadPath: this.downloadPath,
         rpcLists: this.rpcLists,
         whitelist: this.whitelist,
         blocklist: this.blocklist
@@ -82,9 +87,12 @@ const vm = new Vue({
       this.showSavedInfo()
     },
     clear () {
-      chrome.storage.sync.clear()
-      chrome.storage.local.clear()
-      location.reload()
+      const confirmMessage = chrome.i18n.getMessage('resetConfirm')
+      if (window.confirm(confirmMessage)) {
+        chrome.storage.sync.clear()
+        chrome.storage.local.clear()
+        location.reload()
+      }
     },
     showSavedInfo () {
       this.saved = true

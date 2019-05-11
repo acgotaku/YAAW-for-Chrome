@@ -20,7 +20,8 @@
         <div class="form-horizontal">
           <fieldset>
             <legend>
-              <span>{{ title }}</span>
+              <h1 class="title">{{ title }}</h1>
+              <span class="version">v{{ version }}</span>
               <span class="config-saved" :class="{show: saved}">{{ saveSuccess }}</span>
             </legend>
             <div class="control-group">
@@ -47,11 +48,18 @@
                 <label class="checkbox">
                   <input type="checkbox" id="interception" v-model="isInterception" class="interception">
                   {{ interceptionDesc }} &nbsp;&nbsp;&nbsp;  {{ fileSizeStr }} &gt;=
-                  <input type="text" class="input-small"  placeholder="File Size" v-model="fileSize">
+                  <input type="number" class="input-small"  placeholder="File Size" v-model="fileSize">
                   （{{ unit }}：M）
                 </label>
               </div>
             </div>
+            <div class="control-group">
+              <label class="control-label" for="downloadPath">{{ downloadPathStr }}</label>
+              <div class="controls">
+                <input type="text" class="input-xlarge" id="downloadPath" v-model="downloadPath">
+                &nbsp;&nbsp;&nbsp; {{ downloadPathDesc }}
+              </div>
+            </div> 
             <div class="control-group" v-for="(rpc, index) in rpcLists">
               <div class="control-group-inner">
                 <input type="text" class="input-small" placeholder="RPC Name" v-model="rpc.name">
