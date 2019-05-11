@@ -26,7 +26,7 @@
    "interceptionDesc": {
       "message": "文件下载会被导入到Aria2c"
    },
-   "fileSize": {
+   "fileSizeStr": {
       "message": "文件大小"
    },
    "unit": {

@@ -23,7 +23,7 @@ const vm = new Vue({
       syncConfigDesc: chrome.i18n.getMessage('syncConfigDesc'),
       interception: chrome.i18n.getMessage('interception'),
       interceptionDesc: chrome.i18n.getMessage('interceptionDesc'),
-      fileSize: chrome.i18n.getMessage('fileSize'),
+      fileSizeStr: chrome.i18n.getMessage('fileSizeStr'),
       unit: chrome.i18n.getMessage('unit'),
       addRPC: chrome.i18n.getMessage('addRPC'),
       removeRPC: chrome.i18n.getMessage('removeRPC'),

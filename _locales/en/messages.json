@@ -26,7 +26,7 @@
    "interceptionDesc": {
       "message": "file download will be imported into Aria2c"
    },
-   "fileSize": {
+   "fileSizeStr": {
       "message": "File size"
    },
    "unit": {

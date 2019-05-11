@@ -133,6 +133,14 @@ function matchRule (str, rule) {
   return new RegExp('^' + rule.split('*').join('.*') + '$').test(str)
 }
 
+function getHostName (url) {
+  if(url.startsWith('http')) {
+    return decodeURI(new URL(url).hostname)
+  } else {
+    return url
+  }
+}
+
 async function isCapture (downloadItem) {
   const { fileSize } = await getConfig('fileSize')
   const { whitelist } = await getConfig('whitelist')
@@ -143,11 +151,12 @@ async function isCapture (downloadItem) {
     return false
   }
 
-  const parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
-  const result = parse_url.exec(url)[3]
+  const target = getHostName(url);
 
   const inWhitelist = whitelist.split('\n').some((site) => {
-    return matchRule(result, site)
+
+    const rule = getHostName(site)
+    return matchRule(target, rule)
   })
 
   if(inWhitelist) {
@@ -155,7 +164,8 @@ async function isCapture (downloadItem) {
   }
 
   const inBlocklist = blocklist.split('\n').some((site) => {
-    return matchRule(result, site)
+    const rule = getHostName(site)
+    return matchRule(target, rule)
   })
 
   if(inBlocklist) {
@@ -168,6 +178,7 @@ async function isCapture (downloadItem) {
     return false
   }
 }
+
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   aria2Send(info.menuItemId, {
     link: info.linkUrl
@@ -178,7 +189,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status === 'loading') {
     chrome.contextMenus.removeAll()
     getConfig('isContextMenus').then(({ isContextMenus }) => {
-      console.log(isContextMenus)
       if (isContextMenus !== false) {
         getConfig('rpcLists').then(({ rpcLists }) => {
           if(!rpcLists) {
@@ -197,25 +207,32 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 })
 
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
-  getConfig('interception').then(({ interception }) => {
-    if (interception && isCapture(downloadItem)) {
-      setTimeout(function () {
-        chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError.message)
-          }
-          getConfig('rpcLists').then(({ rpcLists }) => {
-            // var rpc_list = JSON.parse(localStorage.getItem('rpc_list') || defaultRPC)
-            aria2Send(downloadItem.url, rpcLists[0]['url'], {
-              'filename': decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
-              'icon': iconUrl || 'images/icon.jpg',
-              'id': downloadItem.id
+  getConfig('isInterception').then(({ isInterception }) => {
+    if (isInterception) {
+      isCapture(downloadItem).then(result => {
+        if(result) {
+          chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
+            if (chrome.runtime.lastError) {
+              console.log(chrome.runtime.lastError.message)
+            }
+            getConfig('rpcLists').then(({ rpcLists }) => {
+              if(!rpcLists) {
+                rpcLists = [{
+                  name: 'ARIA2 RPC',
+                  path: defaultRPC
+                }]
+              }
+              aria2Send(rpcLists[0]['path'], {
+                'link': downloadItem.url,
+                'filename': decodeURIComponent(downloadItem.filename).split(/[\/\\]/).pop(),
+                'icon': iconUrl || 'images/icon.jpg'
+              })
+              chrome.downloads.cancel(downloadItem.id, function () {})
+              chrome.downloads.erase({ id: downloadItem.id })
             })
-            chrome.downloads.cancel(downloadItem.id, function () {})
-            chrome.downloads.erase({ id: downloadItem.id })
           })
-        })
-      }, 500)
+        }
+      })
     }
   })
 })
