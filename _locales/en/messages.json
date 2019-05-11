@@ -4,5 +4,62 @@
    },
    "description": {
       "message": "Yet Another Aria2 Web Frontend in pure HTML/CSS/Javascirpt"
+   },
+   "title": {
+      "message": "YAAW for Chrome Settings"
+   },
+   "contextMenu": {
+      "message": "Context menu"
+   },
+   "contextMenuDesc": {
+      "message": "select for enable context menu"
+   },
+   "syncConfig": {
+      "message": "Config sync"
+   },
+   "syncConfigDesc": {
+      "message": "sync config to Cloud"
+   },
+   "interception": {
+      "message": "Download interception"
+   },
+   "interceptionDesc": {
+      "message": "file download will be imported into Aria2c"
+   },
+   "fileSizeStr": {
+      "message": "File size"
+   },
+   "unit": {
+      "message": "unit"
+   },
+   "downloadPathStr": {
+      "message": "Download path"
+   },
+   "downloadPathDesc": {
+      "message": "only support absolute path"
+   },
+   "addRPC": {
+      "message": "Add RPC"
+   },
+   "removeRPC": {
+      "message": "Remove RPC"
+   },
+   "whitelistStr": {
+      "message": "Website whitelist"
+   },
+   "blocklistStr": {
+      "message": "Website blocklist"
+   },
+   "save": {
+      "message": "Save"
+   },
+   "saveSuccess": {
+      "message": "Config updated successfully"
+   },
+   "reset": {
+      "message": "Reset"
+   },
+   "resetConfirm": {
+      "message": "Confirm reset?"
    }
 }

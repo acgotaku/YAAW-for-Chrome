@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>YAAW for Chrome Settings</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, width=device-width">
+    <link href="yaaw/img/favicon.ico" rel="shortcut icon" type="image/ico" />
+    <link href="yaaw/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="yaaw/css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link href="css/options.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app">
+      <nav class="navbar">
+          <div class="container">
+            <div class="logo"></div>
+          </div>
+      </nav>
+      <div class="container">
+        <div class="form-horizontal">
+          <fieldset>
+            <legend>
+              <h1 class="title">{{ title }}</h1>
+              <span class="version">v{{ version }}</span>
+              <span class="config-saved" :class="{show: saved}">{{ saveSuccess }}</span>
+            </legend>
+            <div class="control-group">
+              <label class="control-label" for="contextMenus">{{ contextMenu }}</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="contextMenus" v-model="isContextMenus">
+                  {{ contextMenuDesc }}
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="syncConfig">{{ syncConfig }}</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="syncConfig" v-model="isSync">
+                  {{ syncConfigDesc }}
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="interception">{{ interception }}</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="interception" v-model="isInterception" class="interception">
+                  {{ interceptionDesc }} &nbsp;&nbsp;&nbsp;  {{ fileSizeStr }} &gt;=
+                  <input type="number" class="input-small"  placeholder="File Size" v-model="fileSize">
+                  （{{ unit }}：M）
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="downloadPath">{{ downloadPathStr }}</label>
+              <div class="controls">
+                <input type="text" class="input-xlarge" id="downloadPath" v-model="downloadPath">
+                &nbsp;&nbsp;&nbsp; {{ downloadPathDesc }}
+              </div>
+            </div> 
+            <div class="control-group" v-for="(rpc, index) in rpcLists">
+              <div class="control-group-inner">
+                <input type="text" class="input-small" placeholder="RPC Name" v-model="rpc.name">
+              </div>
+              <div class="controls">
+                <input type="text" class="input-xlarge" placeholder="RPC Path" v-model="rpc.path">
+                <button class="btn btn-rpc" @click="addRPCForm" v-if="index === 0">{{ addRPC }}</button>
+                <button class="btn btn-rpc btn-danger" @click="removeRPCByIndex(index)" v-else>{{ removeRPC }}</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="whitelist">{{ whitelistStr }}</label>
+              <div class="controls">
+                <textarea rows="6" id="whitelist" v-model="whitelist"></textarea>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="blocklist">{{ blocklistStr }}</label>
+              <div class="controls">
+                <textarea rows="6" id="blocklist" v-model="blocklist"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <footer class="footer">
+        <div class="container">
+            <div class="modal-footer">
+              <div class="copyright">© Copyright <a href="https://github.com/acgotaku/YAAW-for-Chrome" target="_blank">雪月秋水</a></div>
+              <button type="btn" class="btn btn-success" @click="saveConfig">{{ save }}</button>
+              <button class="btn" @click="clear">{{ reset }}</button>
+            </div>
+        </div>
+      </footer>
+    </div>
+    <script src="yaaw/js/jquery-1.7.2.min.js"></script>
+    <script src="yaaw/js/bootstrap.min.js"></script>
+    <script src="js/options.js"></script>
+  </body>
+</html>
+<!-- vim: set et sw=2 ts=2 sts=2 ff=unix fenc=utf8: -->

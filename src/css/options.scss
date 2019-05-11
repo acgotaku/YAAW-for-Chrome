@@ -1,0 +1,85 @@
+body,
+html {
+  height: 100%;
+}
+
+textarea {
+  width: 45%;
+}
+
+fieldset {
+  margin-bottom: 50px;
+}
+
+.logo {
+  background-image: url('../images/logo128.png');
+  background-size: 128px 128px;
+  height: 128px;
+  margin-left: 100px;
+  width: 128px;
+}
+
+.navbar {
+  background-color: #8191f1;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+  color: #fff;
+  padding: 15px 15px 0;
+  z-index: 200;
+}
+
+.title {
+  display: inline-block;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.version {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.config-saved {
+  color: #28a745;
+  float: right;
+  font-size: 12px;
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
+.control-group-inner {
+  float: left;
+  text-align: right;
+  width: 140px;
+}
+
+.controls .interception {
+  margin-top: 6px;
+}
+
+legend {
+  margin-bottom: 0;
+}
+
+.btn-rpc {
+  margin-left: 10px;
+}
+
+.add-rpc {
+  margin-left: 10px;
+}
+
+.footer {
+  background-color: #f5f5f5;
+  bottom: 0;
+  position: fixed;
+  text-align: right;
+  width: 100%;
+}
+
+.copyright {
+  float: left;
+  margin-top: 10px;
+}
