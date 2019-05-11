@@ -1,4 +1,4 @@
-# YAAW for Chrome
+# YAAW for Chrome [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dennnbdlpgjgbcjfgaohdahloollfgoc.svg)](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)
 
 You can use YAAW as the chrome extension.
 
