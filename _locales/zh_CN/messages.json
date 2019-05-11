@@ -4,5 +4,53 @@
    },
    "description": {
       "message": "YAAW的chrome版本,支持右键添加到YAAW进行下载"
+   },
+   "title": {
+      "message": "YAAW for Chrome 设置"
+   },
+   "contextMenu": {
+      "message": "右键菜单"
+   },
+   "contextMenuDesc": {
+      "message": "选中即可开启右键菜单"
+   },
+   "syncConfig": {
+      "message": "配置同步"
+   },
+   "syncConfigDesc": {
+      "message": "多设备自动云同步"
+   },
+   "interception": {
+      "message": "下载拦截"
+   },
+   "interceptionDesc": {
+      "message": "文件下载会被导入到Aria2c"
+   },
+   "fileSize": {
+      "message": "文件大小"
+   },
+   "unit": {
+      "message": "单位"
+   },
+   "addRPC": {
+      "message": "添加RPC"
+   },
+   "removeRPC": {
+      "message": "删除RPC"
+   },
+   "whitelistStr": {
+      "message": "网站白名单"
+   },
+   "blocklistStr": {
+      "message": "网站黑名单"
+   },
+   "save": {
+      "message": "保存"
+   },
+   "saveSuccess": {
+      "message": "更新配置成功"
+   },
+   "reset": {
+      "message": "重置"
    }
 }

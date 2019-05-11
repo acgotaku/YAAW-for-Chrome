@@ -20,35 +20,35 @@
         <div class="form-horizontal">
           <fieldset>
             <legend>
-              <span>YAAW for Chrome Settings</span>
-              <span class="config-saved">Config updated successfully</span>
+              <span>{{ title }}</span>
+              <span class="config-saved" :class="{show: saved}">{{ saveSuccess }}</span>
             </legend>
             <div class="control-group">
-              <label class="control-label" for="contextMenus">右键菜单</label>
+              <label class="control-label" for="contextMenus">{{ contextMenu }}</label>
               <div class="controls">
                 <label class="checkbox">
                   <input type="checkbox" id="contextMenus" v-model="isContextMenus">
-                  选中即可开启右键菜单
+                  {{ contextMenuDesc }}
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="syncConfig">配置同步</label>
+              <label class="control-label" for="syncConfig">{{ syncConfig }}</label>
               <div class="controls">
                 <label class="checkbox">
                   <input type="checkbox" id="syncConfig" v-model="isSync">
-                  多设备自动云同步
+                  {{ syncConfigDesc }}
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="interception">下载拦截</label>
+              <label class="control-label" for="interception">{{ interception }}</label>
               <div class="controls">
                 <label class="checkbox">
                   <input type="checkbox" id="interception" v-model="isInterception" class="interception">
-                  文件下载会被导入到Aria2c &nbsp;&nbsp;&nbsp;  文件大小 &gt;=
+                  {{ interceptionDesc }} &nbsp;&nbsp;&nbsp;  {{ fileSize }} &gt;=
                   <input type="text" class="input-small"  placeholder="File Size" v-model="fileSize">
-                  （单位：M）
+                  （{{ unit }}：M）
                 </label>
               </div>
             </div>
@@ -58,18 +58,18 @@
               </div>
               <div class="controls">
                 <input type="text" class="input-xlarge" placeholder="RPC Path" v-model="rpc.path">
-                <button class="btn btn-rpc" @click="addRPCForm" v-if="index === 0">Add RPC</button>
-                <button class="btn btn-rpc btn-danger" @click="removeRPC(index)" v-else>Remove RPC</button>
+                <button class="btn btn-rpc" @click="addRPCForm" v-if="index === 0">{{ addRPC }}</button>
+                <button class="btn btn-rpc btn-danger" @click="removeRPCByIndex(index)" v-else>{{ removeRPC }}</button>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="whitelist">网站白名单</label>
+              <label class="control-label" for="whitelist">{{ whitelistStr }}</label>
               <div class="controls">
                 <textarea rows="6" id="whitelist" v-model="whitelist"></textarea>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="blocklist">网站黑名单</label>
+              <label class="control-label" for="blocklist">{{ blocklistStr }}</label>
               <div class="controls">
                 <textarea rows="6" id="blocklist" v-model="blocklist"></textarea>
               </div>
@@ -81,8 +81,8 @@
         <div class="container">
             <div class="modal-footer">
               <div class="copyright">© Copyright <a href="https://github.com/acgotaku/YAAW-for-Chrome" target="_blank">雪月秋水</a></div>
-              <button type="btn" class="btn btn-success" @click="save">Save</button>
-              <button class="btn" @click="clear">Reset</button>
+              <button type="btn" class="btn btn-success" @click="saveConfig">{{ save }}</button>
+              <button class="btn" @click="clear">{{ reset }}</button>
             </div>
         </div>
       </footer>
