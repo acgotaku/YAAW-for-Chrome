@@ -19,7 +19,11 @@ Download interception feature only use first RPC address.
 
 Please visit [Web Store](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc) 
 
-License
+# Contribution
+
+Please make sure to read the [Contributing Guide](https://github.com/acgotaku/YAAW-for-Chrome/blob/master/.github/CONTRIBUTING.md) before making a pull request.
+
+# License
 -------
 ![GPLv3](https://www.gnu.org/graphics/gplv3-127x51.png)
 
