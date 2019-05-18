@@ -5,6 +5,30 @@
    "description": {
       "message": "Yet Another Aria2 Web Frontend in pure HTML/CSS/Javascirpt"
    },
+   "updated": {
+      "message": "updated"
+   },
+   "updatedDesc": {
+      "message": "YAAW for Chrome updated to $version$ version",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "0.2.0"
+         }
+      }
+   },
+   "startDownload": {
+      "message": "start downlaod!"
+   },
+   "downloadSuccess": {
+      "message": "Successfully imported into Aria2c!"
+   },
+   "downloadFailed": {
+      "message": "download failed"
+   },
+   "downloadFailedDesc": {
+      "message": "Importing Aria2c failed"
+   },
    "title": {
       "message": "YAAW for Chrome Settings"
    },
@@ -13,6 +37,12 @@
    },
    "contextMenuDesc": {
       "message": "select for enable context menu"
+   },
+   "autoRename": {
+      "message": "Auto rename"
+   },
+   "autoRenameDesc": {
+      "message": "advanced feature, please keep default value"
    },
    "syncConfig": {
       "message": "Config sync"

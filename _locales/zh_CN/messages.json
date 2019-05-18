@@ -5,6 +5,30 @@
    "description": {
       "message": "YAAW的chrome版本,支持右键添加到YAAW进行下载"
    },
+   "updated": {
+      "message": "更新"
+   },
+   "updatedDesc": {
+      "message": "YAAW for Chrome更新到 $version$ 版本啦～",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "0.2.0"
+         }
+      }
+   },
+   "startDownload": {
+      "message": "开始下载"
+   },
+   "downloadSuccess": {
+      "message": "导出下载成功～"
+   },
+   "downloadFailed": {
+      "message": "下载失败"
+   },
+   "downloadFailedDesc": {
+      "message": "导出下载失败! QAQ"
+   },
    "title": {
       "message": "YAAW for Chrome 设置"
    },
@@ -13,6 +37,12 @@
    },
    "contextMenuDesc": {
       "message": "选中即可开启右键菜单"
+   },
+   "autoRename": {
+      "message": "自动文件重命名"
+   },
+   "autoRenameDesc": {
+      "message": "高级功能，请保持默认值"
    },
    "syncConfig": {
       "message": "配置同步"

@@ -140,8 +140,8 @@ function aria2Send (rpcPath, fileDownloadInfo) {
       httpSend(parameter, () => {
         const opt = {
           type: 'basic',
-          title: '开始下载',
-          message: fileDownloadInfo.fileName ? fileDownloadInfo.fileName : '导出下载成功~',
+          title: chrome.i18n.getMessage('startDownload'),
+          message: fileDownloadInfo.fileName ? fileDownloadInfo.fileName : chrome.i18n.getMessage('downloadSuccess'),
           iconUrl: fileDownloadInfo.icon ? fileDownloadInfo.icon : 'images/icon.jpg'
         }
         const id = new Date().getTime().toString()
@@ -150,8 +150,8 @@ function aria2Send (rpcPath, fileDownloadInfo) {
         console.log(error)
         const opt = {
           type: 'basic',
-          title: '下载失败',
-          message: '导出下载失败! QAQ',
+          title: chrome.i18n.getMessage('downloadFailed'),
+          message: chrome.i18n.getMessage('downloadFailedDesc'),
           iconUrl: 'images/icon.jpg'
         }
         const id = new Date().getTime().toString()
@@ -216,7 +216,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   })
 })
 
-chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
+function interceptionDownload (downloadItem) {
   getConfig('isInterception').then(({ isInterception }) => {
     if (isInterception) {
       isCapture(downloadItem).then(result => {
@@ -245,6 +245,16 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem) {
       })
     }
   })
+}
+
+getConfig('isAutoRename').then(({ isAutoRename }) => {
+  if (isAutoRename !== false) {
+    console.log('onDeterminingFilename')
+    chrome.downloads.onDeterminingFilename.addListener(interceptionDownload)
+  } else {
+    console.log('onCreated')
+    chrome.downloads.onCreated.addListener(interceptionDownload)
+  }
 })
 
 function openYAAW () {
@@ -271,8 +281,8 @@ const previousVersion = localStorage.getItem('version')
 if (previousVersion === '' || previousVersion !== manifest.version) {
   const opt = {
     type: 'basic',
-    title: '更新',
-    message: 'YAAW for Chrome更新到' + manifest.version + '版本啦～\n此次更新支持自定义下载路径',
+    title: chrome.i18n.getMessage('updated'),
+    message: chrome.i18n.getMessage('updatedDesc', manifest.version),
     iconUrl: 'images/icon.jpg'
   }
   const id = new Date().getTime().toString()

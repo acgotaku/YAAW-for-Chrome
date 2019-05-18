@@ -34,6 +34,15 @@
               </div>
             </div>
             <div class="control-group">
+              <label class="control-label" for="autoRename">{{ autoRename }}</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="autoRename" v-model="isAutoRename">
+                  {{ autoRenameDesc }}
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
               <label class="control-label" for="syncConfig">{{ syncConfig }}</label>
               <div class="controls">
                 <label class="checkbox">

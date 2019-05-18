@@ -6,6 +6,7 @@ const vm = new Vue({
   data () {
     return {
       isContextMenus: true,
+      isAutoRename: true,
       isInterception: false,
       isSync: false,
       fileSize: 0,
@@ -21,6 +22,8 @@ const vm = new Vue({
       title: chrome.i18n.getMessage('title'),
       contextMenu: chrome.i18n.getMessage('contextMenu'),
       contextMenuDesc: chrome.i18n.getMessage('contextMenuDesc'),
+      autoRename: chrome.i18n.getMessage('autoRename'),
+      autoRenameDesc: chrome.i18n.getMessage('autoRenameDesc'),
       syncConfig: chrome.i18n.getMessage('syncConfig'),
       syncConfigDesc: chrome.i18n.getMessage('syncConfigDesc'),
       interception: chrome.i18n.getMessage('interception'),
@@ -66,6 +69,7 @@ const vm = new Vue({
     saveConfig () {
       const configData = {
         isContextMenus: this.isContextMenus,
+        isAutoRename: this.isAutoRename,
         isInterception: this.isInterception,
         isSync: this.isSync,
         fileSize: this.fileSize,
