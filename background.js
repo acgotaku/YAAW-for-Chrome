@@ -249,10 +249,8 @@ function interceptionDownload (downloadItem) {
 
 getConfig('isAutoRename').then(({ isAutoRename }) => {
   if (isAutoRename !== false) {
-    console.log('onDeterminingFilename')
     chrome.downloads.onDeterminingFilename.addListener(interceptionDownload)
   } else {
-    console.log('onCreated')
     chrome.downloads.onCreated.addListener(interceptionDownload)
   }
 })
