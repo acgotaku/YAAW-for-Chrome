@@ -1,6 +1,6 @@
 {
   "name": "yaaw-for-chrome",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Yet Another Aria2 Web Frontend in pure HTML/CSS/Javascirpt Powered by Chrome.",
   "main": "background.js",
   "scripts": {
