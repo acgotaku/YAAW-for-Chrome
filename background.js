@@ -62,10 +62,19 @@ function showNotification (id, opt) {
     chrome.notifications.clear(id, function () {})
   }, 3000)
 }
+
+function request_auth(url) {
+  return url.match(/^(?:(?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1];
+}
+
+function remove_auth(url) {
+  return url.replace(/^((?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3');
+}
+
 // 解析 RPC地址 返回验证数据 和地址
 function parseURL (url) {
-  const parseURL = new URL(url)
-  let authStr = parseURL.username ? `${parseURL.username}:${decodeURI(parseURL.password)}` : null
+  const parseURL = new URL(remove_auth(url))
+  let authStr = request_auth(url)
   if (authStr) {
     if (!authStr.includes('token:')) {
       authStr = `Basic ${btoa(authStr)}`
