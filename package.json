@@ -1,18 +1,18 @@
 {
   "name": "yaaw-for-chrome",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Yet Another Aria2 Web Frontend in pure HTML/CSS/Javascirpt Powered by Chrome.",
   "main": "background.js",
   "scripts": {
-    "start": "npm run dev",
+    "start": "yarn dev",
     "dev": "NODE_ENV=development gulp serve",
     "build": "NODE_ENV=production gulp publish",
     "clean": "gulp clean",
-    "lint:js": "gulp lint:js",
-    "lint:css": "gulp lint:css",
-    "eslint:fix": "eslint --fix src",
+    "lint:js": "eslint src background.js",
+    "lint:css": "stylelint \"src/**/*.scss\"",
+    "eslint:fix": "eslint --fix src background.js",
     "stylelint:fix": "stylefmt -r \"src/**/*.scss\" && stylelint \"src/**/*.scss\" -s scss",
-    "test": "npm run lint:js && npm run lint:css"
+    "test": "yarn lint:js && yarn lint:css"
   },
   "repository": {
     "type": "git",

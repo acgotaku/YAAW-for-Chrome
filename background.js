@@ -63,18 +63,18 @@ function showNotification (id, opt) {
   }, 3000)
 }
 
-function request_auth(url) {
-  return url.match(/^(?:(?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1];
+function requestAuth (url) {
+  return url.match(/^(?:(?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1]
 }
 
-function remove_auth(url) {
-  return url.replace(/^((?![^:@]+:[^:@\/]*@)[^:\/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3');
+function removeAuth (url) {
+  return url.replace(/^((?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3')
 }
 
 // 解析 RPC地址 返回验证数据 和地址
 function parseURL (url) {
-  const parseURL = new URL(remove_auth(url))
-  let authStr = request_auth(url)
+  const parseURL = new URL(removeAuth(url))
+  let authStr = requestAuth(url)
   if (authStr) {
     if (!authStr.includes('token:')) {
       authStr = `Basic ${btoa(authStr)}`
