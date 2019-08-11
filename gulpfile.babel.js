@@ -8,7 +8,6 @@ import htmlhint from 'gulp-htmlhint'
 import eslint from 'gulp-eslint'
 import stylelint from 'gulp-stylelint'
 
-
 import postcss from 'gulp-postcss'
 import sass from 'gulp-sass'
 import autoprefixer from 'autoprefixer'
@@ -76,7 +75,7 @@ const config = {
 
 export const clean = () => del([ 'dist' ])
 
-export function htmls() {
+export function htmls () {
   return gulp.src(paths.htmls.src)
     .pipe(plumber(config.plumberConfig))
     .pipe(htmlhint(config.htmlhintConfig))
@@ -84,7 +83,7 @@ export function htmls() {
     .pipe(gulp.dest(paths.htmls.dest))
 }
 
-export function styles() {
+export function styles () {
   return gulp.src(paths.styles.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
     .pipe(stylelint({
@@ -98,15 +97,13 @@ export function styles() {
       includePaths: ['.']
     }))
     .pipe(postcss([
-      autoprefixer({
-        browsers: ['last 1 versions']
-      })
+      autoprefixer()
     ]))
     .pipe(gulpIf(config.env.prod, cleanCSS()))
     .pipe(gulp.dest(paths.styles.dest), { sourcemaps: config.env.dev })
 }
 
-export function scripts() {
+export function scripts () {
   return gulp.src(paths.scripts.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
     .pipe(eslint())
@@ -122,19 +119,19 @@ export function scripts() {
         }),
         rollupCommon(),
         replace({
-          'process.env.NODE_ENV': JSON.stringify('development'),
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
           'process.env.VUE_ENV': JSON.stringify('browser')
         })
-      ]},
-      {
-        format: 'iife'
-      }
-      ))
+      ] },
+    {
+      format: 'iife'
+    }
+    ))
     .pipe(gulpIf(config.env.prod, uglify()))
     .pipe(gulp.dest(paths.scripts.dest), { sourcemaps: config.env.dev })
 }
 
-export function images() {
+export function images () {
   return gulp.src(paths.images.src)
     .pipe(plumber(config.plumberConfig))
     .pipe(imagemin([
@@ -146,19 +143,19 @@ export function images() {
     .pipe(gulp.dest(paths.images.dest))
 }
 
-export function copys() {
+export function copys () {
   return gulp.src(paths.copys.src, { base: '.' })
     .pipe(gulp.dest(paths.copys.dest))
 }
 
-export function watch() {
+export function watch () {
   gulp.watch(paths.htmls.src, htmls)
   gulp.watch(paths.scripts.src, scripts)
   gulp.watch(paths.styles.src, styles)
   gulp.watch(paths.copys.src, copys)
 }
 
-export function compress() {
+export function compress () {
   return gulp.src(paths.compress.src)
     .pipe(zip('chrome.zip'))
     .pipe(gulp.dest(paths.compress.dest))
