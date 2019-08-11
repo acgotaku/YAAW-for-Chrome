@@ -63,7 +63,7 @@ function showNotification (id, opt) {
   }, 3000)
 }
 
-function requestAuth (url) {
+function requestAuthxx (url) {
   return url.match(/^(?:(?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1]
 }
 
