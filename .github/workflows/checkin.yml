@@ -11,6 +11,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         version: 10.x
+
+    - name: "npm install"
+      run: yarn install
+
     - name: "test pull request"
       run: |
         yarn test
