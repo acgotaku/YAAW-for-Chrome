@@ -34,10 +34,10 @@
     "@babel/register": "^7.5.5",
     "autoprefixer": "^9.6.1",
     "del": "^4.1.1",
-    "eslint": "^5.16.0",
+    "eslint": "^6.3.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "gulp": "^4.0.2",
@@ -63,7 +63,7 @@
     "stylefmt": "^6.0.3",
     "stylelint": "^7.13.0",
     "stylelint-config-sass-guidelines": "^6.0.0",
-    "stylelint-order": "3^.0.1",
+    "stylelint-order": "^3.0.1",
     "stylelint-scss": "^3.9.3"
   },
   "dependencies": {
