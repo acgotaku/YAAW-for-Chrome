@@ -36,3 +36,6 @@ Please make sure to read the [Contributing Guide](https://github.com/acgotaku/YA
 ![GPLv3](https://www.gnu.org/graphics/gplv3-127x51.png)
 
 YAAW-for-Chrome is licensed under [GNU General Public License](https://www.gnu.org/licenses/gpl.html) Version 3 or later.
+
+
+da
