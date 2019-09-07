@@ -1,18 +1,16 @@
 name: Check pull request
 
-on: [pull_request]
-
+on: [pull_request, push]
 jobs:
-  build:
 
+  check_pr:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: "Use Node.js 10.x"
       uses: actions/setup-node@v1
       with:
         version: 10.x
-    - name: test pull request
+    - name: "test pull request"
       run: |
         yarn test
