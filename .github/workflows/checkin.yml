@@ -15,6 +15,9 @@ jobs:
     - name: "yarn install"
       run: yarn install
 
+    - name: "yarn build"
+      run: yarn build
+
     - name: "test pull request"
       run: |
         yarn test
