@@ -40,7 +40,7 @@ function updateContextMenu () {
             }]
           }
           rpcLists.forEach(rpcItem => {
-            addContextMenu(rpcItem['path'], rpcItem['name'])
+            addContextMenu(rpcItem.path, rpcItem.name)
           })
         })
       }
@@ -81,9 +81,9 @@ function parseURL (url) {
     }
   }
   const paramsString = parseURL.hash.substr(1)
-  let options = {}
+  const options = {}
   const searchParams = new URLSearchParams(paramsString)
-  for (let key of searchParams) {
+  for (const key of searchParams) {
     options[key[0]] = key.length === 2 ? key[1] : 'enabled'
   }
   const path = parseURL.origin + parseURL.pathname
@@ -105,13 +105,13 @@ function generateParameter (authStr, path, data) {
     }
   }
   if (authStr && authStr.startsWith('Basic')) {
-    parameter.options.headers['Authorization'] = authStr
+    parameter.options.headers.Authorization = authStr
   }
   return parameter
 }
 function aria2Send (rpcPath, fileDownloadInfo) {
   const { authStr, path, options } = parseURL(rpcPath)
-  chrome.cookies.getAll({ 'url': fileDownloadInfo.link }, function (cookies) {
+  chrome.cookies.getAll({ url: fileDownloadInfo.link }, function (cookies) {
     const formatedCookies = []
     cookies.forEach(cookie => {
       formatedCookies.push(cookie.name + '=' + cookie.value)
@@ -121,27 +121,27 @@ function aria2Send (rpcPath, fileDownloadInfo) {
     header.push('User-Agent: ' + navigator.userAgent)
 
     const rpcData = {
-      'jsonrpc': '2.0',
-      'method': 'aria2.addUri',
-      'id': new Date().getTime(),
-      'params': [
+      jsonrpc: '2.0',
+      method: 'aria2.addUri',
+      id: new Date().getTime(),
+      params: [
         [fileDownloadInfo.link], {
-          'header': header
+          header: header
         }
       ]
     }
     const rpcOption = rpcData.params[1]
     if (fileDownloadInfo.fileName) {
-      rpcOption['out'] = fileDownloadInfo.fileName
+      rpcOption.out = fileDownloadInfo.fileName
     }
     if (options) {
-      for (let key in options) {
+      for (const key in options) {
         rpcOption[key] = options[key]
       }
     }
     getConfig('downloadPath').then(({ downloadPath }) => {
       if (downloadPath) {
-        rpcOption['dir'] = downloadPath
+        rpcOption.dir = downloadPath
       }
 
       const parameter = generateParameter(authStr, path, rpcData)
@@ -241,10 +241,10 @@ function interceptionDownload (downloadItem) {
                   path: defaultRPC
                 }]
               }
-              aria2Send(rpcLists[0]['path'], {
-                'link': downloadItem.finalUrl,
-                'filename': decodeURIComponent(downloadItem.filename).split(/[/\\]/).pop(),
-                'icon': iconUrl || 'images/icon.jpg'
+              aria2Send(rpcLists[0].path, {
+                link: downloadItem.finalUrl,
+                filename: decodeURIComponent(downloadItem.filename).split(/[/\\]/).pop(),
+                icon: iconUrl || 'images/icon.jpg'
               })
               chrome.downloads.cancel(downloadItem.id, function () {})
               chrome.downloads.erase({ id: downloadItem.id })

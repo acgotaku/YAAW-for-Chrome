@@ -43,7 +43,7 @@ const vm = new Vue({
   },
   mounted () {
     chrome.storage.sync.get(null, (items) => {
-      for (let key in items) {
+      for (const key in items) {
         this[key] = items[key]
         chrome.storage.local.set({ key: items[key] }, () => {
           console.log('chrome first local set: %s, %s', key, items[key])
@@ -51,7 +51,7 @@ const vm = new Vue({
       }
     })
     chrome.storage.local.get(null, (items) => {
-      for (let key in items) {
+      for (const key in items) {
         this[key] = items[key]
       }
     })
@@ -78,11 +78,11 @@ const vm = new Vue({
         whitelist: this.whitelist,
         blocklist: this.blocklist
       }
-      for (let key in configData) {
+      for (const key in configData) {
         chrome.storage.local.set({ [key]: configData[key] }, () => {
           console.log('chrome local set: %s, %s', key, configData[key])
         })
-        if (configData['isSync'] === true) {
+        if (configData.isSync === true) {
           chrome.storage.sync.set({ [key]: configData[key] }, () => {
             console.log('chrome sync set: %s, %s', key, configData[key])
           })
