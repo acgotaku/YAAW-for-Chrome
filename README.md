@@ -1,4 +1,4 @@
-# YAAW for Chrome [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dennnbdlpgjgbcjfgaohdahloollfgoc.svg)](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)
+# YAAW for Chrome [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dennnbdlpgjgbcjfgaohdahloollfgoc.svg)](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc) [![GitHub Actions status](https://github.com/acgotaku/YAAW-for-Chrome/workflows/check-pr/badge.svg)](https://github.com/acgotaku//YAAW-for-Chrome/actions)
 
 You can use YAAW as the chrome extension.
 

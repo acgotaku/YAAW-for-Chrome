@@ -1,23 +1,29 @@
-name: Check pull request
+name: check-pr
 
-on: [pull_request, push]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
 jobs:
 
   check_pr:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: "Use Node.js 10.x"
+    - uses: actions/checkout@v1
+    - name: Use Node.js 10.x
       uses: actions/setup-node@v1
       with:
-        version: 10.x
+        node-version: 10.x
 
-    - name: "yarn install"
+    - name: Install dependencies
       run: yarn install
 
-    - name: "yarn build"
+    - name: Check build
       run: yarn build
 
-    - name: "test pull request"
-      run: |
-        yarn test
+    - name: Check code
+      run: yarn test
