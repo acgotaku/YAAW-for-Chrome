@@ -5160,6 +5160,21 @@ lodash.clonedeep@^4.3.2:
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
   integrity sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
 
+lodash.isboolean@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
+  integrity sha1-bC4XHbKiV82WgC/UOwGyDV9YcPY=
+
+lodash.isregexp@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/lodash.isregexp/-/lodash.isregexp-4.0.1.tgz#e13e647b30cd559752a04cd912086faf7da1c30b"
+  integrity sha1-4T5kezDNVZdSoEzZEghvr32hwws=
+
+lodash.isstring@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/lodash.isstring/-/lodash.isstring-4.0.1.tgz#d527dfb5456eca7cc9bb95d5daeaf88ba54a5451"
+  integrity sha1-1SfftUVuynzJu5XV2ur4i6VKVFE=
+
 lodash@^4.0.0, lodash@^4.1.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4, lodash@~4.17.10, lodash@~4.17.11:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
@@ -7879,12 +7894,14 @@ stylelint-order@^3.0.0, stylelint-order@^3.1.1:
     postcss "^7.0.17"
     postcss-sorting "^5.0.1"
 
-stylelint-scss@^3.12.1, stylelint-scss@^3.4.0:
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.12.1.tgz#0b06122a33dd2ef368121e920bd3ecfa323bedf2"
-  integrity sha512-k6B78HrqJ6pib5yOtmId7osVGrE2Amcf0VU+tdzk+oqwXe/0+VKtbkogeXrmGKt+z54QhxvjEO++qlE/a7EWlA==
+stylelint-scss@^3.13.0, stylelint-scss@^3.4.0:
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.13.0.tgz#875c76e61d95333c4f0ae737a310be6f1d27d780"
+  integrity sha512-SaLnvQyndaPcsgVJsMh6zJ1uKVzkRZJx+Wg/stzoB1mTBdEmGketbHrGbMQNymzH/0mJ06zDSpeCDvNxqIJE5A==
   dependencies:
-    lodash "^4.17.15"
+    lodash.isboolean "^3.0.3"
+    lodash.isregexp "^4.0.1"
+    lodash.isstring "^4.0.1"
     postcss-media-query-parser "^0.2.3"
     postcss-resolve-nested-selector "^0.1.1"
     postcss-selector-parser "^6.0.2"
