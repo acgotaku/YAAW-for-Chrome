@@ -34,7 +34,7 @@
     "@babel/register": "^7.7.0",
     "autoprefixer": "^9.7.2",
     "del": "^5.1.0",
-    "eslint": "^6.7.0",
+    "eslint": "^6.7.1",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^10.0.0",
