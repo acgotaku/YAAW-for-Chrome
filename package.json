@@ -32,7 +32,7 @@
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
     "@babel/register": "^7.7.4",
-    "autoprefixer": "^9.7.2",
+    "autoprefixer": "^9.7.3",
     "del": "^5.1.0",
     "eslint": "^6.7.1",
     "eslint-config-standard": "^14.1.0",
