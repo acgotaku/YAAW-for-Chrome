@@ -51,7 +51,7 @@
     "gulp-postcss": "^8.0.0",
     "gulp-rollup-each": "^3.0.1",
     "gulp-sass": "^4.0.2",
-    "gulp-stylelint": "^10.0.0",
+    "gulp-stylelint": "^11.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-zip": "^5.0.1",
     "imagemin-mozjpeg": "^8.0.0",
