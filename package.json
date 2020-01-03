@@ -49,7 +49,7 @@
     "gulp-imagemin": "^6.2.0",
     "gulp-plumber": "^1.2.1",
     "gulp-postcss": "^8.0.0",
-    "gulp-rollup-each": "^3.0.1",
+    "gulp-rollup-each": "^3.0.2",
     "gulp-sass": "^4.0.2",
     "gulp-stylelint": "^11.0.0",
     "gulp-uglify": "^3.0.2",

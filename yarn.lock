@@ -3962,10 +3962,10 @@ gulp-postcss@^8.0.0:
     postcss-load-config "^2.0.0"
     vinyl-sourcemaps-apply "^0.2.1"
 
-gulp-rollup-each@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/gulp-rollup-each/-/gulp-rollup-each-3.0.1.tgz#e4736a654bb3cc221a3095f9a3dfca56f41f5a20"
-  integrity sha512-UNQvHThFSjaXClsWh6zzs+tHxXSUY+KgC3NfcwVGKEERfAA55jS730K7zO+4enhsqNGE16bKP+I/5GqRJ1UosQ==
+gulp-rollup-each@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/gulp-rollup-each/-/gulp-rollup-each-3.0.2.tgz#2cf3e774f374613acceb9fb91ff568c02b8226d1"
+  integrity sha512-yXTyl4b2xvC2rfq92LZtWHOMvM2tbW/X7wuYRfrYLN2d2BT7AV4H09o3SLgw+xPa/t3RFatP3uZQ5QPtMpGcLA==
   dependencies:
     plugin-error "^1.0.1"
     rollup "^1.18.0"
