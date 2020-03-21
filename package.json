@@ -64,7 +64,7 @@
     "stylelint": "^13.2.1",
     "stylelint-config-sass-guidelines": "^7.0.0",
     "stylelint-order": "^4.0.0",
-    "stylelint-scss": "^3.15.0"
+    "stylelint-scss": "^3.16.0"
   },
   "dependencies": {
     "vue": "^2.6.11"
