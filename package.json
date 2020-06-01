@@ -30,7 +30,7 @@
   "homepage": "https://github.com/acgotaku/YAAW-for-Chrome#readme",
   "devDependencies": {
     "@babel/core": "^7.10.1",
-    "@babel/preset-env": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
     "@babel/register": "^7.10.1",
     "autoprefixer": "^9.8.0",
     "del": "^5.1.0",
