@@ -4094,10 +4094,10 @@ gulp-eslint@^6.0.0:
     fancy-log "^1.3.2"
     plugin-error "^1.0.1"
 
-gulp-htmlhint@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/gulp-htmlhint/-/gulp-htmlhint-3.0.0.tgz#8d6e5240c5128bf728a40a381cc6022b220434a4"
-  integrity sha512-0Vo/tzJ+pTqjJRGA41vU6bYvqE6UJT2ynr7jeqZ66YYR6yCq7md/w2q0+vXJ6jvXvKa7FoUaefiXrh7VKI1s0A==
+gulp-htmlhint@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/gulp-htmlhint/-/gulp-htmlhint-3.0.1.tgz#61fe516a21494140d6adea08a308714d6459e826"
+  integrity sha512-zUdJi3SdedDjc+rZaUq8hD27jRzn6kqrxgu76NhlmfMNKYVlavrcPNEew+xA4NYEHOgyf0WW9DWYuJ/YgL0Riw==
   dependencies:
     ansi-colors "^4.1.1"
     beeper "^2.0.0"
