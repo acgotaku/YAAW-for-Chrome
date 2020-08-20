@@ -67,6 +67,6 @@
     "stylelint-scss": "^3.18.0"
   },
   "dependencies": {
-    "vue": "^2.6.11"
+    "vue": "^2.6.12"
   }
 }
