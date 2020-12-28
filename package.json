@@ -44,7 +44,7 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-eslint": "^6.0.0",
-    "gulp-htmlhint": "^3.0.1",
+    "gulp-htmlhint": "^4.0.0",
     "gulp-if": "^3.0.0",
     "gulp-imagemin": "^7.1.0",
     "gulp-plumber": "^1.2.1",
