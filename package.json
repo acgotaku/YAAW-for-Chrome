@@ -61,7 +61,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "stylefmt": "^6.0.3",
-    "stylelint": "^13.8.0",
+    "stylelint": "^13.13.1",
     "stylelint-config-sass-guidelines": "^7.1.0",
     "stylelint-order": "^4.1.0",
     "stylelint-scss": "^3.18.0"
