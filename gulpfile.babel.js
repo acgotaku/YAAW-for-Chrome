@@ -9,7 +9,8 @@ import eslint from 'gulp-eslint'
 import stylelint from 'gulp-stylelint'
 
 import postcss from 'gulp-postcss'
-import sass from 'gulp-sass'
+import dartSass from 'sass'
+import gulpSass from 'gulp-sass'
 import autoprefixer from 'autoprefixer'
 import cleanCSS from 'gulp-clean-css'
 
@@ -27,6 +28,8 @@ import pngquant from 'imagemin-pngquant'
 import del from 'del'
 
 import zip from 'gulp-zip'
+
+const sass = gulpSass(dartSass)
 
 const paths = {
   htmls: {
@@ -73,7 +76,7 @@ const config = {
   }
 }
 
-export const clean = () => del([ 'dist' ])
+export const clean = () => del(['dist'])
 
 export function htmls () {
   return gulp.src(paths.htmls.src)
@@ -92,7 +95,6 @@ export function styles () {
       ]
     }))
     .pipe(sass({
-      outputStyle: 'nested',
       precision: 3,
       includePaths: ['.']
     }))
@@ -122,7 +124,8 @@ export function scripts () {
           'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
           'process.env.VUE_ENV': JSON.stringify('browser')
         })
-      ] },
+      ]
+    },
     {
       format: 'iife'
     }
