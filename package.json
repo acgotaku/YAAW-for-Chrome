@@ -63,7 +63,7 @@
     "sass": "^1.49.9",
     "stylefmt": "^6.0.3",
     "stylelint": "^13.8.0",
-    "stylelint-config-sass-guidelines": "^7.1.0",
+    "stylelint-config-sass-guidelines": "^8.0.0",
     "stylelint-order": "^4.1.0",
     "stylelint-scss": "^3.18.0"
   },
