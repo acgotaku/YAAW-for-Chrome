@@ -46,7 +46,7 @@
     "gulp-eslint": "^6.0.0",
     "gulp-htmlhint": "^3.0.1",
     "gulp-if": "^3.0.0",
-    "gulp-imagemin": "^7.1.0",
+    "gulp-imagemin": "^8.0.0",
     "gulp-plumber": "^1.2.1",
     "gulp-postcss": "^8.0.0",
     "gulp-rollup-each": "^3.0.2",
