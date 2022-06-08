@@ -5,9 +5,6 @@ import gulpIf from 'gulp-if'
 
 import htmlhint from 'gulp-htmlhint'
 
-import eslint from 'gulp-eslint'
-import stylelint from 'gulp-stylelint'
-
 import postcss from 'gulp-postcss'
 import dartSass from 'sass'
 import gulpSass from 'gulp-sass'
@@ -15,10 +12,9 @@ import autoprefixer from 'autoprefixer'
 import cleanCSS from 'gulp-clean-css'
 
 import rollupEach from 'gulp-rollup-each'
-import rollupBabel from 'rollup-plugin-babel'
-import rollupResolve from 'rollup-plugin-node-resolve'
-import replace from 'rollup-plugin-replace'
-import rollupCommon from 'rollup-plugin-commonjs'
+import rollupCommon from '@rollup/plugin-commonjs'
+import rollupResolve from '@rollup/plugin-node-resolve'
+import replace from '@rollup/plugin-replace'
 import uglify from 'gulp-uglify'
 
 import imagemin from 'gulp-imagemin'
@@ -89,11 +85,6 @@ export function htmls () {
 export function styles () {
   return gulp.src(paths.styles.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
-    .pipe(stylelint({
-      reporters: [
-        { formatter: 'string', console: true }
-      ]
-    }))
     .pipe(sass({
       precision: 3,
       includePaths: ['.']
@@ -108,19 +99,15 @@ export function styles () {
 export function scripts () {
   return gulp.src(paths.scripts.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
-    .pipe(eslint())
-    .pipe(eslint.format())
     .pipe(rollupEach({
       isCache: true,
       plugins: [
-        rollupBabel({
-          presets: ['@babel/preset-env']
-        }),
+        rollupCommon(),
         rollupResolve({
           browser: true
         }),
-        rollupCommon(),
         replace({
+          preventAssignment: true,
           'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
           'process.env.VUE_ENV': JSON.stringify('browser')
         })
