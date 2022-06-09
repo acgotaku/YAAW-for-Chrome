@@ -22,8 +22,8 @@ const getConfig = (key) => {
 // 生成右键菜单
 function addContextMenu (id, title) {
   chrome.contextMenus.create({
-    id: id,
-    title: title,
+    id,
+    title,
     contexts: ['link']
   })
 }
@@ -126,7 +126,7 @@ function aria2Send (rpcPath, fileDownloadInfo) {
       id: new Date().getTime(),
       params: [
         [fileDownloadInfo.link], {
-          header: header
+          header
         }
       ]
     }

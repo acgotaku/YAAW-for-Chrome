@@ -8,13 +8,13 @@ Before contributing to YAAW-for-Chrome, please make sure to take a moment and re
 
 ## Development Setup
 
-Please make sure your [Node.js](http://nodejs.org) **version 8+** and [Yarn](https://yarnpkg.com) **version 1.13.0+**
+Please make sure your [Node.js](http://nodejs.org) **version 16+** and [pnpm](https://pnpm.io) **version 6.32.4+**
 
 After cloning the repo, run:
 
 ``` bash
-$ yarn install
-$ yarn dev
+$ pnpm install
+$ pnpm dev
 ```
 
 Now, you can load extension from `dist` fold. Gulp will watch and re-build the project.
@@ -22,7 +22,7 @@ Now, you can load extension from `dist` fold. Gulp will watch and re-build the p
 If you want to package the extension. run:
 
 ``` bash
-$ yarn build
+$ pnpm build
 ```
 
 Gulp will generate compressed file in `dist` fold.
