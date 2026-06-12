@@ -19,7 +19,7 @@ const getConfig = (key) => {
     chrome.storage.local.get(key, resolve)
   })
 }
-// 生成右键菜单
+
 function addContextMenu (id, title) {
   chrome.contextMenus.create({
     id,
@@ -47,21 +47,21 @@ function updateContextMenu () {
     })
   })
 }
+
 chrome.storage.onChanged.addListener(function (changes, areaName) {
   if (changes.rpcLists) {
     updateContextMenu()
   }
 })
 
-// 弹出chrome通知
 function showNotification (id, opt) {
-  chrome.notifications.create(id, opt, function (notifyId) {
-    return notifyId
-  })
-  setTimeout(function () {
-    chrome.notifications.clear(id, function () {})
-  }, 3000)
+  chrome.notifications.create(id, opt)
+  chrome.alarms.create(id, { delayInMinutes: 0.05 })
 }
+
+chrome.alarms.onAlarm.addListener(({ name }) => {
+  chrome.notifications.clear(name)
+})
 
 function requestAuth (url) {
   return url.match(/^(?:(?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1]
@@ -71,22 +71,21 @@ function removeAuth (url) {
   return url.replace(/^((?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(\/\/)?(?:(?:[^:@]*(?::[^:@]*)?)?@)?(.*)/, '$1$2$3')
 }
 
-// 解析 RPC地址 返回验证数据 和地址
 function parseURL (url) {
-  const parseURL = new URL(removeAuth(url))
+  const parsedURL = new URL(removeAuth(url))
   let authStr = requestAuth(url)
   if (authStr) {
     if (!authStr.includes('token:')) {
       authStr = `Basic ${btoa(authStr)}`
     }
   }
-  const paramsString = parseURL.hash.substr(1)
+  const paramsString = parsedURL.hash.substring(1)
   const options = {}
   const searchParams = new URLSearchParams(paramsString)
   for (const key of searchParams) {
     options[key[0]] = key.length === 2 ? key[1] : 'enabled'
   }
-  const path = parseURL.origin + parseURL.pathname
+  const path = parsedURL.origin + parsedURL.pathname
   return { authStr, path, options }
 }
 
@@ -109,6 +108,7 @@ function generateParameter (authStr, path, data) {
   }
   return parameter
 }
+
 function aria2Send (rpcPath, fileDownloadInfo) {
   const { authStr, path, options } = parseURL(rpcPath)
   chrome.cookies.getAll({ url: fileDownloadInfo.link }, function (cookies) {
@@ -256,49 +256,65 @@ function interceptionDownload (downloadItem) {
   })
 }
 
-getConfig('isAutoRename').then(({ isAutoRename }) => {
-  if (isAutoRename !== false) {
-    chrome.downloads.onDeterminingFilename.addListener(interceptionDownload)
-  } else {
-    chrome.downloads.onCreated.addListener(interceptionDownload)
-  }
+// Register both listeners synchronously; isAutoRename config is checked inside each handler
+chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
+  suggest()
+  getConfig('isAutoRename').then(({ isAutoRename }) => {
+    if (isAutoRename !== false) {
+      interceptionDownload(downloadItem)
+    }
+  })
+})
+
+chrome.downloads.onCreated.addListener(function (downloadItem) {
+  getConfig('isAutoRename').then(({ isAutoRename }) => {
+    if (isAutoRename === false) {
+      interceptionDownload(downloadItem)
+    }
+  })
 })
 
 function openYAAW () {
-  const index = chrome.extension.getURL('yaaw/index.html')
-  chrome.tabs.getAllInWindow(undefined, function (tabs) {
+  const index = chrome.runtime.getURL('yaaw/index.html')
+  chrome.tabs.query({}, function (tabs) {
+    let found = false
     tabs.forEach(tab => {
       if (tab.url && tab.url === index) {
-        chrome.tabs.update(tab.id, { selected: true })
+        chrome.tabs.update(tab.id, { active: true })
+        found = true
       }
     })
-    chrome.tabs.create({ url: index })
+    if (!found) {
+      chrome.tabs.create({ url: index })
+    }
   })
 }
-chrome.browserAction.onClicked.addListener(function () {
+
+chrome.action.onClicked.addListener(function () {
   openYAAW()
 })
 
 chrome.notifications.onClicked.addListener(function () {
   openYAAW()
 })
-// 软件版本更新提示
-const manifest = chrome.runtime.getManifest()
-const previousVersion = localStorage.getItem('version')
-if (previousVersion === '' || previousVersion !== manifest.version) {
-  const opt = {
-    type: 'basic',
-    title: chrome.i18n.getMessage('updated'),
-    message: chrome.i18n.getMessage('updatedDesc', manifest.version),
-    iconUrl: 'images/icon.jpg'
+
+chrome.runtime.onInstalled.addListener(async ({ previousVersion }) => {
+  const manifest = chrome.runtime.getManifest()
+  if (previousVersion !== manifest.version) {
+    const opt = {
+      type: 'basic',
+      title: chrome.i18n.getMessage('updated'),
+      message: chrome.i18n.getMessage('updatedDesc', manifest.version),
+      iconUrl: 'images/icon.jpg'
+    }
+    const id = new Date().getTime().toString()
+    showNotification(id, opt)
   }
-  const id = new Date().getTime().toString()
-  showNotification(id, opt)
-  localStorage.setItem('version', manifest.version)
-}
 
-if (!localStorage.getItem('jsonrpc_path')) {
-  localStorage.setItem('jsonrpc_path', defaultRPC)
-}
+  const { jsonrpc_path } = await getConfig('jsonrpc_path')
+  if (!jsonrpc_path) {
+    chrome.storage.local.set({ jsonrpc_path: defaultRPC })
+  }
 
-updateContextMenu()
+  updateContextMenu()
+})

@@ -1,3 +1,4 @@
+import { readFileSync, writeFileSync } from 'fs'
 import gulp from 'gulp'
 import plumber from 'gulp-plumber'
 import gulpIf from 'gulp-if'
@@ -10,8 +11,8 @@ import cleanCSS from 'gulp-clean-css'
 import rollupEach from 'gulp-rollup-each'
 import rollupCommon from '@rollup/plugin-commonjs'
 import rollupResolve from '@rollup/plugin-node-resolve'
-import replace from '@rollup/plugin-replace'
 import terser from 'gulp-terser'
+import replace from 'gulp-replace'
 import { deleteAsync } from 'del'
 import zip from 'gulp-zip'
 
@@ -97,11 +98,6 @@ function scripts () {
         rollupCommon(),
         rollupResolve({
           browser: true
-        }),
-        replace({
-          preventAssignment: true,
-          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-          'process.env.VUE_ENV': JSON.stringify('browser')
         })
       ]
     },
@@ -119,8 +115,41 @@ function images () {
 }
 
 function copys () {
-  return gulp.src(paths.copys.src, { base: '.' })
-    .pipe(gulp.dest(paths.copys.dest))
+  return gulp.src(paths.copys.src, { base: '.', encoding: false })
+    .pipe(gulp.dest(paths.copys.dest, { encoding: false }))
+}
+
+// Patch yaaw submodule files in dist to remove MV3-incompatible patterns
+function patchYaaw () {
+  return gulp.src([
+    'dist/yaaw/index.html',
+    'dist/yaaw/js/jquery.jsonrpc.js',
+    'dist/yaaw/js/mustache.js',
+    'dist/yaaw/js/yaaw.js'
+  ], { base: 'dist' })
+    // Remove AppCache manifest attribute
+    .pipe(replace(/ manifest="offline\.appcache"/, ''))
+    // Replace eval-based JSON parsing with JSON.parse
+    .pipe(replace(/eval\s*\(\s*'[(]'\s*\+\s*json\s*\+\s*'[)]'\s*\)/, 'JSON.parse(json)'))
+    // Fix default JSON-RPC path: location.* resolves to chrome-extension:// in MV3
+    .pipe(replace(
+      '$.Storage.get("jsonrpc_path") || location.protocol+"//"+(location.host.split(":")[0]||"localhost")+":6800"+"/jsonrpc"',
+      '$.Storage.get("jsonrpc_path") || "http://localhost:6800/jsonrpc"'
+    ))
+    // Replace old mustache.js with vendor mustache v4 content
+    .pipe(gulp.dest('dist'))
+}
+
+// Replace old mustache.js in dist with v4 from node_modules.
+// Appends a compile() shim because yaaw.js uses Mustache.compile(tpl) which
+// was removed in v4 — the shim wraps Mustache.render() with a closure instead.
+function replaceMustache (cb) {
+  const content = readFileSync('node_modules/mustache/mustache.min.js', 'utf8')
+  const shim = '\n;(function(){if(typeof Mustache!=="undefined"&&!Mustache.compile){' +
+    'Mustache.compile=function(t){return function(v,p){return Mustache.render(t,v,p||{});};};' +
+    '}})();'
+  writeFileSync('dist/yaaw/js/mustache.js', content + shim)
+  cb()
 }
 
 function watch () {
@@ -136,6 +165,10 @@ export function compress () {
     .pipe(gulp.dest(paths.compress.dest))
 }
 
-export const build = gulp.parallel(htmls, styles, scripts, images, copys)
+const patch = gulp.series(patchYaaw, replaceMustache)
+export const build = gulp.series(
+  gulp.parallel(htmls, styles, scripts, images, copys),
+  patch
+)
 export const serve = gulp.series(clean, build, watch)
 export const publish = gulp.series(clean, build, compress)

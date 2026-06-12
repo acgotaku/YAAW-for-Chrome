@@ -1,7 +1,6 @@
 {
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
   "default_locale": "en",
   "description": "__MSG_description__",
@@ -10,20 +9,25 @@
     "64": "images/logo64.png",
     "128": "images/logo128.png"
   },
-  "manifest_version": 2,
-  "browser_action": {
+  "manifest_version": 3,
+  "action": {
     "default_icon": "images/logo32.png"
   },
-  "options_page": "options.html",
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "permissions": [
+    "alarms",
     "cookies",
     "notifications",
     "tabs",
     "contextMenus",
     "downloads",
-    "<all_urls>",
     "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "name": "__MSG_appName__",
   "version": "0.2.3"
