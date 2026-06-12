@@ -311,8 +311,8 @@ chrome.runtime.onInstalled.addListener(async ({ previousVersion }) => {
     showNotification(id, opt)
   }
 
-  const { jsonrpc_path } = await getConfig('jsonrpc_path')
-  if (!jsonrpc_path) {
+  const { jsonrpc_path: jsonrpcPath } = await getConfig('jsonrpc_path')
+  if (!jsonrpcPath) {
     chrome.storage.local.set({ jsonrpc_path: defaultRPC })
   }
 
