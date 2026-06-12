@@ -145,9 +145,27 @@ function patchYaaw () {
 // was removed in v4 — the shim wraps Mustache.render() with a closure instead.
 function replaceMustache (cb) {
   const content = readFileSync('node_modules/mustache/mustache.min.js', 'utf8')
-  const shim = '\n;(function(){if(typeof Mustache!=="undefined"&&!Mustache.compile){' +
-    'Mustache.compile=function(t){return function(v,p){return Mustache.render(t,v,p||{});};};' +
-    '}})();'
+  // compile() shim: removed in v4, but yaaw.js uses it
+  // renderSection patch: v4 passes raw template text to lambdas (spec-compliant),
+  // but yaaw.js expects pre-rendered content (old mustache behavior).
+  const shim = '\n;(function(){' +
+    'if(typeof Mustache==="undefined")return;' +
+    'if(!Mustache.compile){' +
+      'Mustache.compile=function(t){return function(v,p){return Mustache.render(t,v,p||{});};};' +
+    '}' +
+    'var _rs=Mustache.Writer.prototype.renderSection;' +
+    'Mustache.Writer.prototype.renderSection=function(token,context,partials,originalTemplate,config){' +
+      'var value=context.lookup(token[1]);' +
+      'if(typeof value==="function"){' +
+        'var self=this;' +
+        'var raw=originalTemplate.slice(token[3],token[5]);' +
+        'var rendered=self.render(raw,context,partials,config);' +
+        'var result=value.call(context.view,rendered);' +
+        'return result!=null?String(result):"";' +
+      '}' +
+      'return _rs.call(this,token,context,partials,originalTemplate,config);' +
+    '};' +
+    '})();'
   writeFileSync('dist/yaaw/js/mustache.js', content + shim)
   cb()
 }
