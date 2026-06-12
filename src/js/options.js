@@ -156,17 +156,20 @@ function showSaved () {
 }
 
 function loadConfig () {
-  chrome.storage.sync.get(null, (syncItems) => {
-    Object.assign(state, syncItems)
-    chrome.storage.local.set(syncItems)
-
-    chrome.storage.local.get(null, (localItems) => {
-      Object.assign(state, localItems)
-      if (!state.rpcLists) {
-        state.rpcLists = [{ ...defaultRPC }]
-      }
+  chrome.storage.local.get(null, (localItems) => {
+    Object.assign(state, localItems)
+    if (!state.rpcLists) {
+      state.rpcLists = [{ ...defaultRPC }]
+    }
+    // Only pull from sync storage when the user has opted in
+    if (state.isSync) {
+      chrome.storage.sync.get(null, (syncItems) => {
+        Object.assign(state, syncItems)
+        fillForm()
+      })
+    } else {
       fillForm()
-    })
+    }
   })
 }
 

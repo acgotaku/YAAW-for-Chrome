@@ -56,12 +56,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 
 function showNotification (id, opt) {
   chrome.notifications.create(id, opt)
-  chrome.alarms.create(id, { delayInMinutes: 0.05 })
 }
-
-chrome.alarms.onAlarm.addListener(({ name }) => {
-  chrome.notifications.clear(name)
-})
 
 function requestAuth (url) {
   return url.match(/^(?:(?![^:@]+:[^:@/]*@)[^:/?#.]+:)?(?:\/\/)?(?:([^:@]*(?::[^:@]*)?)?@)?/)[1]
