@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
+          submodules: true
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6

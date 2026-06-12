@@ -20,75 +20,66 @@
         <div class="form-horizontal">
           <fieldset>
             <legend>
-              <h1 class="title">{{ title }}</h1>
-              <span class="version">v{{ version }}</span>
-              <span class="config-saved" :class="{show: saved}">{{ saveSuccess }}</span>
+              <h1 class="title" id="title"></h1>
+              <span class="version" id="version"></span>
+              <span class="config-saved" id="config-saved"></span>
             </legend>
             <div class="control-group">
-              <label class="control-label" for="contextMenus">{{ contextMenu }}</label>
+              <label class="control-label" for="contextMenus" id="label-contextMenus"></label>
               <div class="controls">
                 <label class="checkbox">
-                  <input type="checkbox" id="contextMenus" v-model="isContextMenus">
-                  {{ contextMenuDesc }}
+                  <input type="checkbox" id="contextMenus">
+                  <span id="contextMenuDesc"></span>
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="autoRename">{{ autoRename }}</label>
+              <label class="control-label" for="autoRename" id="label-autoRename"></label>
               <div class="controls">
                 <label class="checkbox">
-                  <input type="checkbox" id="autoRename" v-model="isAutoRename">
-                  {{ autoRenameDesc }}
+                  <input type="checkbox" id="autoRename">
+                  <span id="autoRenameDesc"></span>
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="syncConfig">{{ syncConfig }}</label>
+              <label class="control-label" for="syncConfig" id="label-syncConfig"></label>
               <div class="controls">
                 <label class="checkbox">
-                  <input type="checkbox" id="syncConfig" v-model="isSync">
-                  {{ syncConfigDesc }}
+                  <input type="checkbox" id="syncConfig">
+                  <span id="syncConfigDesc"></span>
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="interception">{{ interception }}</label>
+              <label class="control-label" for="interception" id="label-interception"></label>
               <div class="controls">
                 <label class="checkbox">
-                  <input type="checkbox" id="interception" v-model="isInterception" class="interception">
-                  {{ interceptionDesc }} &nbsp;&nbsp;&nbsp;  {{ fileSizeStr }} &gt;=
-                  <input type="number" class="input-small"  placeholder="File Size" v-model="fileSize">
-                  （{{ unit }}：M）
+                  <input type="checkbox" id="interception" class="interception">
+                  <span id="interceptionDesc"></span> &nbsp;&nbsp;&nbsp; <span id="fileSizeStr"></span> &gt;=
+                  <input type="number" class="input-small" placeholder="File Size" id="fileSize">
+                  （<span id="unit"></span>：M）
                 </label>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="downloadPath">{{ downloadPathStr }}</label>
+              <label class="control-label" for="downloadPath" id="label-downloadPath"></label>
               <div class="controls">
-                <input type="text" class="input-xlarge" id="downloadPath" v-model="downloadPath">
-                &nbsp;&nbsp;&nbsp; {{ downloadPathDesc }}
+                <input type="text" class="input-xlarge" id="downloadPath">
+                &nbsp;&nbsp;&nbsp; <span id="downloadPathDesc"></span>
               </div>
-            </div> 
-            <div class="control-group" v-for="(rpc, index) in rpcLists">
-              <div class="control-group-inner">
-                <input type="text" class="input-small" placeholder="RPC Name" v-model="rpc.name">
-              </div>
+            </div>
+            <div id="rpc-list"></div>
+            <div class="control-group">
+              <label class="control-label" for="whitelist" id="label-whitelist"></label>
               <div class="controls">
-                <input type="text" class="input-xlarge" placeholder="RPC Path" v-model="rpc.path">
-                <button class="btn btn-rpc" @click="addRPCForm" v-if="index === 0">{{ addRPC }}</button>
-                <button class="btn btn-rpc btn-danger" @click="removeRPCByIndex(index)" v-else>{{ removeRPC }}</button>
+                <textarea rows="6" id="whitelist"></textarea>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="whitelist">{{ whitelistStr }}</label>
+              <label class="control-label" for="blocklist" id="label-blocklist"></label>
               <div class="controls">
-                <textarea rows="6" id="whitelist" v-model="whitelist"></textarea>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="blocklist">{{ blocklistStr }}</label>
-              <div class="controls">
-                <textarea rows="6" id="blocklist" v-model="blocklist"></textarea>
+                <textarea rows="6" id="blocklist"></textarea>
               </div>
             </div>
           </fieldset>
@@ -98,8 +89,8 @@
         <div class="container">
             <div class="modal-footer">
               <div class="copyright">© Copyright <a href="https://github.com/acgotaku/YAAW-for-Chrome" target="_blank">雪月秋水</a></div>
-              <button type="btn" class="btn btn-success" @click="saveConfig">{{ save }}</button>
-              <button class="btn" @click="clear">{{ reset }}</button>
+              <button type="button" class="btn btn-success" id="btn-save"></button>
+              <button type="button" class="btn" id="btn-reset"></button>
             </div>
         </div>
       </footer>

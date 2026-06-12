@@ -1,110 +1,178 @@
-import Vue from 'vue/dist/vue.esm.js'
+const defaultRPC = {
+  name: 'ARIA2 RPC',
+  path: 'http://localhost:6800/jsonrpc'
+}
 
-Vue.config.productionTip = false
+const state = {
+  isContextMenus: true,
+  isAutoRename: true,
+  isInterception: false,
+  isSync: false,
+  fileSize: 0,
+  downloadPath: '',
+  rpcLists: [{ ...defaultRPC }],
+  whitelist: '',
+  blocklist: ''
+}
 
-const vm = new Vue({
-  data () {
-    return {
-      isContextMenus: true,
-      isAutoRename: true,
-      isInterception: false,
-      isSync: false,
-      fileSize: 0,
-      downloadPath: '',
-      rpcLists: [{
-        name: 'ARIA2 RPC',
-        path: 'http://localhost:6800/jsonrpc'
-      }],
-      whitelist: '',
-      blocklist: '',
-      saved: false,
-      version: chrome.runtime.getManifest().version,
-      title: chrome.i18n.getMessage('title'),
-      contextMenu: chrome.i18n.getMessage('contextMenu'),
-      contextMenuDesc: chrome.i18n.getMessage('contextMenuDesc'),
-      autoRename: chrome.i18n.getMessage('autoRename'),
-      autoRenameDesc: chrome.i18n.getMessage('autoRenameDesc'),
-      syncConfig: chrome.i18n.getMessage('syncConfig'),
-      syncConfigDesc: chrome.i18n.getMessage('syncConfigDesc'),
-      interception: chrome.i18n.getMessage('interception'),
-      interceptionDesc: chrome.i18n.getMessage('interceptionDesc'),
-      fileSizeStr: chrome.i18n.getMessage('fileSizeStr'),
-      unit: chrome.i18n.getMessage('unit'),
-      downloadPathStr: chrome.i18n.getMessage('downloadPathStr'),
-      downloadPathDesc: chrome.i18n.getMessage('downloadPathDesc'),
-      addRPC: chrome.i18n.getMessage('addRPC'),
-      removeRPC: chrome.i18n.getMessage('removeRPC'),
-      whitelistStr: chrome.i18n.getMessage('whitelistStr'),
-      blocklistStr: chrome.i18n.getMessage('blocklistStr'),
-      save: chrome.i18n.getMessage('save'),
-      saveSuccess: chrome.i18n.getMessage('saveSuccess'),
-      reset: chrome.i18n.getMessage('reset')
-    }
-  },
-  mounted () {
-    chrome.storage.sync.get(null, (items) => {
-      for (const key in items) {
-        this[key] = items[key]
-        chrome.storage.local.set({ key: items[key] }, () => {
-          console.log('chrome first local set: %s, %s', key, items[key])
-        })
-      }
-    })
-    chrome.storage.local.get(null, (items) => {
-      for (const key in items) {
-        this[key] = items[key]
-      }
-    })
-  },
-  methods: {
-    addRPCForm () {
-      this.rpcLists.push({
-        name: '',
-        path: ''
-      })
-    },
-    removeRPCByIndex (index) {
-      this.rpcLists.splice(index, 1)
-    },
-    saveConfig () {
-      const configData = {
-        isContextMenus: this.isContextMenus,
-        isAutoRename: this.isAutoRename,
-        isInterception: this.isInterception,
-        isSync: this.isSync,
-        fileSize: this.fileSize,
-        downloadPath: this.downloadPath,
-        rpcLists: this.rpcLists,
-        whitelist: this.whitelist,
-        blocklist: this.blocklist
-      }
-      for (const key in configData) {
-        chrome.storage.local.set({ [key]: configData[key] }, () => {
-          console.log('chrome local set: %s, %s', key, configData[key])
-        })
-        if (configData.isSync === true) {
-          chrome.storage.sync.set({ [key]: configData[key] }, () => {
-            console.log('chrome sync set: %s, %s', key, configData[key])
-          })
+function i18n (key) {
+  return chrome.i18n.getMessage(key)
+}
+
+function $ (id) {
+  return document.getElementById(id)
+}
+
+function renderRPCList () {
+  const container = $('rpc-list')
+  container.innerHTML = ''
+  state.rpcLists.forEach((rpc, index) => {
+    const div = document.createElement('div')
+    div.className = 'control-group'
+    div.innerHTML = `
+      <div class="control-group-inner">
+        <input type="text" class="input-small" placeholder="RPC Name" value="${escapeHtml(rpc.name)}" data-index="${index}" data-field="name">
+      </div>
+      <div class="controls">
+        <input type="text" class="input-xlarge" placeholder="RPC Path" value="${escapeHtml(rpc.path)}" data-index="${index}" data-field="path">
+        ${index === 0
+          ? `<button class="btn btn-rpc" id="btn-add-rpc">${i18n('addRPC')}</button>`
+          : `<button class="btn btn-rpc btn-danger" data-remove="${index}">${i18n('removeRPC')}</button>`
         }
-      }
-      this.showSavedInfo()
-    },
-    clear () {
-      const confirmMessage = chrome.i18n.getMessage('resetConfirm')
-      if (window.confirm(confirmMessage)) {
-        chrome.storage.sync.clear()
-        chrome.storage.local.clear()
-        location.reload()
-      }
-    },
-    showSavedInfo () {
-      this.saved = true
-      setTimeout(() => {
-        this.saved = false
-      }, 3000)
-    }
-  }
-})
+      </div>
+    `
+    container.appendChild(div)
+  })
 
-vm.$mount('#app')
+  container.querySelector('#btn-add-rpc')?.addEventListener('click', () => {
+    state.rpcLists.push({ name: '', path: '' })
+    renderRPCList()
+  })
+
+  container.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.remove)
+      state.rpcLists.splice(idx, 1)
+      renderRPCList()
+    })
+  })
+
+  container.querySelectorAll('input[data-index]').forEach(input => {
+    input.addEventListener('input', () => {
+      const idx = parseInt(input.dataset.index)
+      const field = input.dataset.field
+      state.rpcLists[idx][field] = input.value
+    })
+  })
+}
+
+function escapeHtml (str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function fillI18n () {
+  $('title').textContent = i18n('title')
+  $('version').textContent = 'v' + chrome.runtime.getManifest().version
+  $('config-saved').textContent = i18n('saveSuccess')
+  $('label-contextMenus').textContent = i18n('contextMenu')
+  $('contextMenuDesc').textContent = i18n('contextMenuDesc')
+  $('label-autoRename').textContent = i18n('autoRename')
+  $('autoRenameDesc').textContent = i18n('autoRenameDesc')
+  $('label-syncConfig').textContent = i18n('syncConfig')
+  $('syncConfigDesc').textContent = i18n('syncConfigDesc')
+  $('label-interception').textContent = i18n('interception')
+  $('interceptionDesc').textContent = i18n('interceptionDesc')
+  $('fileSizeStr').textContent = i18n('fileSizeStr')
+  $('unit').textContent = i18n('unit')
+  $('label-downloadPath').textContent = i18n('downloadPathStr')
+  $('downloadPathDesc').textContent = i18n('downloadPathDesc')
+  $('label-whitelist').textContent = i18n('whitelistStr')
+  $('label-blocklist').textContent = i18n('blocklistStr')
+  $('btn-save').textContent = i18n('save')
+  $('btn-reset').textContent = i18n('reset')
+}
+
+function fillForm () {
+  $('contextMenus').checked = state.isContextMenus
+  $('autoRename').checked = state.isAutoRename
+  $('syncConfig').checked = state.isSync
+  $('interception').checked = state.isInterception
+  $('fileSize').value = state.fileSize
+  $('downloadPath').value = state.downloadPath
+  $('whitelist').value = state.whitelist
+  $('blocklist').value = state.blocklist
+  renderRPCList()
+}
+
+function bindFormEvents () {
+  $('contextMenus').addEventListener('change', e => { state.isContextMenus = e.target.checked })
+  $('autoRename').addEventListener('change', e => { state.isAutoRename = e.target.checked })
+  $('syncConfig').addEventListener('change', e => { state.isSync = e.target.checked })
+  $('interception').addEventListener('change', e => { state.isInterception = e.target.checked })
+  $('fileSize').addEventListener('input', e => { state.fileSize = Number(e.target.value) })
+  $('downloadPath').addEventListener('input', e => { state.downloadPath = e.target.value })
+  $('whitelist').addEventListener('input', e => { state.whitelist = e.target.value })
+  $('blocklist').addEventListener('input', e => { state.blocklist = e.target.value })
+
+  $('btn-save').addEventListener('click', saveConfig)
+  $('btn-reset').addEventListener('click', clearConfig)
+}
+
+function saveConfig () {
+  const configData = {
+    isContextMenus: state.isContextMenus,
+    isAutoRename: state.isAutoRename,
+    isInterception: state.isInterception,
+    isSync: state.isSync,
+    fileSize: state.fileSize,
+    downloadPath: state.downloadPath,
+    rpcLists: state.rpcLists,
+    whitelist: state.whitelist,
+    blocklist: state.blocklist
+  }
+  chrome.storage.local.set(configData)
+  if (configData.isSync) {
+    chrome.storage.sync.set(configData)
+  }
+  showSaved()
+}
+
+function clearConfig () {
+  if (window.confirm(i18n('resetConfirm'))) {
+    chrome.storage.sync.clear()
+    chrome.storage.local.clear()
+    location.reload()
+  }
+}
+
+function showSaved () {
+  const el = $('config-saved')
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 3000)
+}
+
+function loadConfig () {
+  chrome.storage.local.get(null, (localItems) => {
+    Object.assign(state, localItems)
+    if (!state.rpcLists) {
+      state.rpcLists = [{ ...defaultRPC }]
+    }
+    // Only pull from sync storage when the user has opted in
+    if (state.isSync) {
+      chrome.storage.sync.get(null, (syncItems) => {
+        Object.assign(state, syncItems)
+        fillForm()
+      })
+    } else {
+      fillForm()
+    }
+  })
+}
+
+fillI18n()
+bindFormEvents()
+loadConfig()
