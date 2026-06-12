@@ -1,28 +1,18 @@
 import gulp from 'gulp'
-
 import plumber from 'gulp-plumber'
 import gulpIf from 'gulp-if'
-
 import htmlhint from 'gulp-htmlhint'
-
 import postcss from 'gulp-postcss'
-import dartSass from 'sass'
+import * as dartSass from 'sass'
 import gulpSass from 'gulp-sass'
 import autoprefixer from 'autoprefixer'
 import cleanCSS from 'gulp-clean-css'
-
 import rollupEach from 'gulp-rollup-each'
 import rollupCommon from '@rollup/plugin-commonjs'
 import rollupResolve from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
-import uglify from 'gulp-uglify'
-
-import imagemin from 'gulp-imagemin'
-import mozjpeg from 'imagemin-mozjpeg'
-import pngquant from 'imagemin-pngquant'
-
-import del from 'del'
-
+import terser from 'gulp-terser'
+import { deleteAsync } from 'del'
 import zip from 'gulp-zip'
 
 const sass = gulpSass(dartSass)
@@ -72,9 +62,11 @@ const config = {
   }
 }
 
-export const clean = () => del(['dist'])
+export function clean () {
+  return deleteAsync(['dist'])
+}
 
-export function htmls () {
+function htmls () {
   return gulp.src(paths.htmls.src)
     .pipe(plumber(config.plumberConfig))
     .pipe(htmlhint(config.htmlhintConfig))
@@ -82,7 +74,7 @@ export function htmls () {
     .pipe(gulp.dest(paths.htmls.dest))
 }
 
-export function styles () {
+function styles () {
   return gulp.src(paths.styles.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
     .pipe(sass({
@@ -93,10 +85,10 @@ export function styles () {
       autoprefixer()
     ]))
     .pipe(gulpIf(config.env.prod, cleanCSS()))
-    .pipe(gulp.dest(paths.styles.dest), { sourcemaps: config.env.dev })
+    .pipe(gulp.dest(paths.styles.dest, { sourcemaps: config.env.dev }))
 }
 
-export function scripts () {
+function scripts () {
   return gulp.src(paths.scripts.src, { sourcemaps: config.env.dev })
     .pipe(plumber(config.plumberConfig))
     .pipe(rollupEach({
@@ -117,28 +109,21 @@ export function scripts () {
       format: 'iife'
     }
     ))
-    .pipe(gulpIf(config.env.prod, uglify()))
-    .pipe(gulp.dest(paths.scripts.dest), { sourcemaps: config.env.dev })
+    .pipe(gulpIf(config.env.prod, terser()))
+    .pipe(gulp.dest(paths.scripts.dest, { sourcemaps: config.env.dev }))
 }
 
-export function images () {
-  return gulp.src(paths.images.src)
-    .pipe(plumber(config.plumberConfig))
-    .pipe(imagemin([
-      pngquant(),
-      mozjpeg()
-    ], {
-      verbose: true
-    }))
-    .pipe(gulp.dest(paths.images.dest))
+function images () {
+  return gulp.src(paths.images.src, { encoding: false })
+    .pipe(gulp.dest(paths.images.dest, { encoding: false }))
 }
 
-export function copys () {
+function copys () {
   return gulp.src(paths.copys.src, { base: '.' })
     .pipe(gulp.dest(paths.copys.dest))
 }
 
-export function watch () {
+function watch () {
   gulp.watch(paths.htmls.src, htmls)
   gulp.watch(paths.scripts.src, scripts)
   gulp.watch(paths.styles.src, styles)
@@ -146,12 +131,11 @@ export function watch () {
 }
 
 export function compress () {
-  return gulp.src(paths.compress.src)
+  return gulp.src(paths.compress.src, { encoding: false })
     .pipe(zip('chrome.zip'))
     .pipe(gulp.dest(paths.compress.dest))
 }
+
 export const build = gulp.parallel(htmls, styles, scripts, images, copys)
-
 export const serve = gulp.series(clean, build, watch)
-
 export const publish = gulp.series(clean, build, compress)
