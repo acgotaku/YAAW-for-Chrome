@@ -139,16 +139,13 @@ function saveConfig () {
       console.error('Failed to save config:', chrome.runtime.lastError)
       return
     }
+    showSaved()
     if (configData.isSync) {
       chrome.storage.sync.set(configData, () => {
         if (chrome.runtime.lastError) {
           console.error('Failed to sync config:', chrome.runtime.lastError)
-          return
         }
-        showSaved()
       })
-    } else {
-      showSaved()
     }
   })
 }

@@ -18,7 +18,7 @@ const getConfig = (key) => {
   return new Promise(function (resolve) {
     chrome.storage.local.get(key, (result) => {
       if (chrome.runtime.lastError) {
-        console.error('Failed to read config:', chrome.runtime.lastError)
+        console.error(`Failed to read config key "${key}":`, chrome.runtime.lastError)
         resolve({})
       } else {
         resolve(result)
