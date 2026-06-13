@@ -15,8 +15,14 @@ const httpSend = ({ url, options }, resolve, reject) => {
 }
 
 const getConfig = (key) => {
-  return new Promise(function (resolve) {
-    chrome.storage.local.get(key, resolve)
+  return new Promise(function (resolve, reject) {
+    chrome.storage.local.get(key, (result) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError)
+      } else {
+        resolve(result)
+      }
+    })
   })
 }
 
