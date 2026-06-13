@@ -15,10 +15,11 @@ const httpSend = ({ url, options }, resolve, reject) => {
 }
 
 const getConfig = (key) => {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     chrome.storage.local.get(key, (result) => {
       if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError)
+        console.error('Failed to read config:', chrome.runtime.lastError)
+        resolve({})
       } else {
         resolve(result)
       }
@@ -167,8 +168,6 @@ function aria2Send (rpcPath, fileDownloadInfo) {
         const id = new Date().getTime().toString()
         showNotification(id, opt)
       })
-    }).catch((error) => {
-      console.error('Failed to load config:', error)
     })
   })
 }
