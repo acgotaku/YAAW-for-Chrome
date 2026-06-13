@@ -134,11 +134,20 @@ function saveConfig () {
     whitelist: state.whitelist,
     blocklist: state.blocklist
   }
-  chrome.storage.local.set(configData)
-  if (configData.isSync) {
-    chrome.storage.sync.set(configData)
-  }
-  showSaved()
+  chrome.storage.local.set(configData, () => {
+    if (chrome.runtime.lastError) {
+      console.error('Failed to save config:', chrome.runtime.lastError)
+      return
+    }
+    if (configData.isSync) {
+      chrome.storage.sync.set(configData, () => {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to sync config:', chrome.runtime.lastError)
+        }
+      })
+    }
+    showSaved()
+  })
 }
 
 function clearConfig () {

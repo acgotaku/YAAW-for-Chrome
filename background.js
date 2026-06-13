@@ -71,7 +71,7 @@ function parseURL (url) {
   let authStr = requestAuth(url)
   if (authStr) {
     if (!authStr.includes('token:')) {
-      authStr = `Basic ${btoa(authStr)}`
+      authStr = `Basic ${btoa(Array.from(new TextEncoder().encode(authStr), b => String.fromCharCode(b)).join(''))}`
     }
   }
   const paramsString = parsedURL.hash.substring(1)
@@ -151,7 +151,7 @@ function aria2Send (rpcPath, fileDownloadInfo) {
         const id = new Date().getTime().toString()
         showNotification(id, opt)
       }, (error) => {
-        console.log(error)
+        console.error('aria2 RPC error:', error)
         const opt = {
           type: 'basic',
           title: chrome.i18n.getMessage('downloadFailed'),
@@ -161,6 +161,8 @@ function aria2Send (rpcPath, fileDownloadInfo) {
         const id = new Date().getTime().toString()
         showNotification(id, opt)
       })
+    }).catch((error) => {
+      console.error('Failed to load config:', error)
     })
   })
 }
@@ -178,9 +180,9 @@ function getHostName (url) {
 }
 
 async function isCapture (downloadItem) {
-  const { fileSize } = await getConfig('fileSize')
-  const { whitelist } = await getConfig('whitelist')
-  const { blocklist } = await getConfig('blocklist')
+  const { fileSize = 0 } = await getConfig('fileSize')
+  const { whitelist = '' } = await getConfig('whitelist')
+  const { blocklist = '' } = await getConfig('blocklist')
   const url = downloadItem.referrer || downloadItem.url
 
   if (downloadItem.error || downloadItem.state !== 'in_progress' || url.startsWith('http') === false) {
