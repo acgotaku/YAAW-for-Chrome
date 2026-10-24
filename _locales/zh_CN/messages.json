@@ -83,6 +83,12 @@
    "saveSuccess": {
       "message": "更新配置成功"
    },
+   "syncLoaded": {
+      "message": "已载入云端配置，点保存生效"
+   },
+   "syncFailed": {
+      "message": "已保存到本地，但同步到云端失败（白名单或黑名单可能过长）"
+   },
    "reset": {
       "message": "重置"
    },

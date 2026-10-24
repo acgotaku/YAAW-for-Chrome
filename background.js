@@ -35,31 +35,49 @@ function addContextMenu (id, title) {
   })
 }
 
+// Queue updates so overlapping calls cannot create duplicate menu ids
+let contextMenuUpdate = Promise.resolve()
+
 function updateContextMenu () {
-  chrome.contextMenus.removeAll(() => {
-    getConfig('isContextMenus').then(({ isContextMenus }) => {
-      if (isContextMenus !== false) {
-        getConfig('rpcLists').then(({ rpcLists }) => {
-          if (!rpcLists) {
-            rpcLists = [{
-              name: 'ARIA2 RPC',
-              path: defaultRPC
-            }]
-          }
-          rpcLists.forEach(rpcItem => {
-            addContextMenu(rpcItem.path, rpcItem.name)
-          })
-        })
+  contextMenuUpdate = contextMenuUpdate.then(async () => {
+    await chrome.contextMenus.removeAll()
+    const { isContextMenus } = await getConfig('isContextMenus')
+    if (isContextMenus !== false) {
+      let { rpcLists } = await getConfig('rpcLists')
+      if (!rpcLists) {
+        rpcLists = [{
+          name: 'ARIA2 RPC',
+          path: defaultRPC
+        }]
       }
-    })
+      rpcLists.forEach(rpcItem => {
+        addContextMenu(rpcItem.path, rpcItem.name)
+      })
+    }
   })
 }
 
+const syncKeys = ['isContextMenus', 'isInterception', 'isSync', 'fileSize', 'downloadPath', 'rpcLists', 'whitelist', 'blocklist']
+
+// Local storage is the only place config is read from; synced config is copied
+// into it when this device has sync on, or has never been configured (new device)
+async function pullSyncConfig () {
+  const syncItems = await chrome.storage.sync.get(syncKeys)
+  const { isSync } = await getConfig('isSync')
+  if (isSync === true || (isSync === undefined && syncItems.isSync === true)) {
+    chrome.storage.local.set(syncItems)
+  }
+}
+
 chrome.storage.onChanged.addListener(function (changes, areaName) {
-  if (changes.rpcLists) {
+  if (areaName === 'sync') {
+    pullSyncConfig()
+  } else if (areaName === 'local' && (changes.rpcLists || changes.isContextMenus)) {
     updateContextMenu()
   }
 })
+
+chrome.runtime.onStartup.addListener(pullSyncConfig)
 
 function showNotification (id, opt) {
   chrome.notifications.create(id, opt)
@@ -172,16 +190,29 @@ function aria2Send (rpcPath, fileDownloadInfo) {
   })
 }
 
+// Only * is a wildcard; everything else in the rule matches literally
 function matchRule (str, rule) {
-  return new RegExp('^' + rule.split('*').join('.*') + '$').test(str)
+  const pattern = rule.split('*').map(part => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')
+  return new RegExp('^' + pattern + '$').test(str)
 }
 
 function getHostName (url) {
   if (url.startsWith('http')) {
-    return decodeURI(new URL(url).hostname)
+    try {
+      return decodeURI(new URL(url).hostname)
+    } catch (e) {
+      return url
+    }
   } else {
     return url
   }
+}
+
+function matchList (target, list) {
+  return list.split('\n').some((site) => {
+    site = site.trim().toLowerCase()
+    return site !== '' && matchRule(target, getHostName(site))
+  })
 }
 
 async function isCapture (downloadItem) {
@@ -189,36 +220,26 @@ async function isCapture (downloadItem) {
   const { whitelist = '' } = await getConfig('whitelist')
   const { blocklist = '' } = await getConfig('blocklist')
   const url = downloadItem.referrer || downloadItem.url
+  const link = downloadItem.finalUrl || downloadItem.url
 
-  if (downloadItem.error || downloadItem.state !== 'in_progress' || url.startsWith('http') === false) {
+  // blob:/data: downloads come from http pages but aria2 cannot fetch them
+  if (downloadItem.error || downloadItem.state !== 'in_progress' || !/^https?:/.test(url) || !/^https?:/.test(link)) {
     return false
   }
 
   const target = getHostName(url)
 
-  const inWhitelist = whitelist.split('\n').some((site) => {
-    const rule = getHostName(site)
-    return matchRule(target, rule)
-  })
-
-  if (inWhitelist) {
+  if (matchList(target, whitelist)) {
     return true
   }
 
-  const inBlocklist = blocklist.split('\n').some((site) => {
-    const rule = getHostName(site)
-    return matchRule(target, rule)
-  })
-
-  if (inBlocklist) {
+  if (matchList(target, blocklist)) {
     return false
   }
 
-  if (downloadItem.fileSize >= fileSize * 1024 * 1024) {
-    return true
-  } else {
-    return false
-  }
+  // fileSize is -1 and totalBytes 0 when the server sends no Content-Length
+  const size = Math.max(downloadItem.fileSize, downloadItem.totalBytes)
+  return fileSize <= 0 || size <= 0 || size >= fileSize * 1024 * 1024
 }
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
@@ -296,5 +317,6 @@ chrome.runtime.onInstalled.addListener(async ({ previousVersion }) => {
     chrome.storage.local.set({ jsonrpc_path: defaultRPC })
   }
 
+  await pullSyncConfig()
   updateContextMenu()
 })

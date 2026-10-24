@@ -77,7 +77,6 @@ function escapeHtml (str) {
 function fillI18n () {
   $('title').textContent = i18n('title')
   $('version').textContent = 'v' + chrome.runtime.getManifest().version
-  $('config-saved').textContent = i18n('saveSuccess')
   $('label-contextMenus').textContent = i18n('contextMenu')
   $('contextMenuDesc').textContent = i18n('contextMenuDesc')
   $('label-syncConfig').textContent = i18n('syncConfig')
@@ -107,7 +106,12 @@ function fillForm () {
 
 function bindFormEvents () {
   $('contextMenus').addEventListener('change', e => { state.isContextMenus = e.target.checked })
-  $('syncConfig').addEventListener('change', e => { state.isSync = e.target.checked })
+  $('syncConfig').addEventListener('change', e => {
+    state.isSync = e.target.checked
+    if (state.isSync) {
+      loadSyncConfig()
+    }
+  })
   $('interception').addEventListener('change', e => { state.isInterception = e.target.checked })
   $('fileSize').addEventListener('input', e => { state.fileSize = Number(e.target.value) })
   $('downloadPath').addEventListener('input', e => { state.downloadPath = e.target.value })
@@ -134,14 +138,18 @@ function saveConfig () {
       console.error('Failed to save config:', chrome.runtime.lastError)
       return
     }
-    showSaved()
-    if (configData.isSync) {
-      chrome.storage.sync.set(configData, () => {
-        if (chrome.runtime.lastError) {
-          console.error('Failed to sync config:', chrome.runtime.lastError)
-        }
-      })
+    if (!configData.isSync) {
+      showMessage('saveSuccess')
+      return
     }
+    chrome.storage.sync.set(configData, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to sync config:', chrome.runtime.lastError)
+        showMessage('syncFailed', true)
+      } else {
+        showMessage('saveSuccess')
+      }
+    })
   })
 }
 
@@ -153,27 +161,35 @@ function clearConfig () {
   }
 }
 
-function showSaved () {
+let messageTimer = null
+
+function showMessage (key, isError = false) {
   const el = $('config-saved')
+  el.textContent = i18n(key)
+  el.classList.toggle('error', isError)
   el.classList.add('show')
-  setTimeout(() => el.classList.remove('show'), 3000)
+  clearTimeout(messageTimer)
+  messageTimer = setTimeout(() => el.classList.remove('show'), isError ? 8000 : 3000)
 }
 
+// The background keeps local storage up to date with synced config
 function loadConfig () {
-  chrome.storage.local.get(null, (localItems) => {
+  chrome.storage.local.get(Object.keys(state), (localItems) => {
     Object.assign(state, localItems)
-    if (!state.rpcLists) {
-      state.rpcLists = [{ ...defaultRPC }]
+    fillForm()
+  })
+}
+
+// When sync is turned on, show what is already in the cloud so saving
+// does not silently overwrite another device's config
+function loadSyncConfig () {
+  chrome.storage.sync.get(Object.keys(state), (syncItems) => {
+    if (chrome.runtime.lastError || Object.keys(syncItems).length === 0) {
+      return
     }
-    // Only pull from sync storage when the user has opted in
-    if (state.isSync) {
-      chrome.storage.sync.get(null, (syncItems) => {
-        Object.assign(state, syncItems)
-        fillForm()
-      })
-    } else {
-      fillForm()
-    }
+    Object.assign(state, syncItems, { isSync: true })
+    fillForm()
+    showMessage('syncLoaded')
   })
 }
 

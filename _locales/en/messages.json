@@ -83,6 +83,12 @@
    "saveSuccess": {
       "message": "Config updated successfully"
    },
+   "syncLoaded": {
+      "message": "Loaded config from the cloud, click Save to apply"
+   },
+   "syncFailed": {
+      "message": "Saved locally, but syncing to the cloud failed (the whitelist or blocklist may be too long)"
+   },
    "reset": {
       "message": "Reset"
    },

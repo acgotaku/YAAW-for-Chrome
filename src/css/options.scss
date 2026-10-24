@@ -47,6 +47,10 @@ fieldset {
   &.show {
     opacity: 1;
   }
+
+  &.error {
+    color: #dc3545;
+  }
 }
 
 .control-group-inner {
