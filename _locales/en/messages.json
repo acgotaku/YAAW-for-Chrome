@@ -68,6 +68,9 @@
    "removeRPC": {
       "message": "Remove RPC"
    },
+   "rpcPathDesc": {
+      "message": "If aria2 uses rpc-secret, put the secret in the path: http://token:YOUR_SECRET@localhost:6800/jsonrpc"
+   },
    "whitelistStr": {
       "message": "Website whitelist"
    },

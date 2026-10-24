@@ -68,6 +68,9 @@
    "removeRPC": {
       "message": "删除RPC"
    },
+   "rpcPathDesc": {
+      "message": "如果 aria2 设置了 rpc-secret，请把密钥写进路径：http://token:你的密钥@localhost:6800/jsonrpc"
+   },
    "whitelistStr": {
       "message": "网站白名单"
    },

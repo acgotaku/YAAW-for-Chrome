@@ -38,6 +38,7 @@ function renderRPCList () {
           ? `<button class="btn btn-rpc" id="btn-add-rpc">${i18n('addRPC')}</button>`
           : `<button class="btn btn-rpc btn-danger" data-remove="${index}">${i18n('removeRPC')}</button>`
         }
+        ${index === 0 ? `<span class="help-block">${escapeHtml(i18n('rpcPathDesc'))}</span>` : ''}
       </div>
     `
     container.appendChild(div)
