@@ -38,12 +38,6 @@
    "contextMenuDesc": {
       "message": "选中即可开启右键菜单"
    },
-   "autoRename": {
-      "message": "自动文件重命名"
-   },
-   "autoRenameDesc": {
-      "message": "高级功能，请保持默认值"
-   },
    "syncConfig": {
       "message": "配置同步"
    },

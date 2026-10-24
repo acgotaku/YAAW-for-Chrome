@@ -38,12 +38,6 @@
    "contextMenuDesc": {
       "message": "select for enable context menu"
    },
-   "autoRename": {
-      "message": "Auto rename"
-   },
-   "autoRenameDesc": {
-      "message": "advanced feature, please keep default value"
-   },
    "syncConfig": {
       "message": "Config sync"
    },

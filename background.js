@@ -227,54 +227,32 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   })
 })
 
-function interceptionDownload (downloadItem) {
-  getConfig('isInterception').then(({ isInterception }) => {
-    if (isInterception) {
-      isCapture(downloadItem).then(result => {
-        if (result) {
-          chrome.downloads.getFileIcon(downloadItem.id, function (iconUrl) {
-            if (chrome.runtime.lastError) {
-              console.log(chrome.runtime.lastError.message)
-            }
-            getConfig('rpcLists').then(({ rpcLists }) => {
-              if (!rpcLists) {
-                rpcLists = [{
-                  name: 'ARIA2 RPC',
-                  path: defaultRPC
-                }]
-              }
-              aria2Send(rpcLists[0].path, {
-                link: downloadItem.finalUrl,
-                filename: decodeURIComponent(downloadItem.filename).split(/[/\\]/).pop(),
-                icon: iconUrl || 'images/icon.jpg'
-              })
-              chrome.downloads.cancel(downloadItem.id, function () {})
-              chrome.downloads.erase({ id: downloadItem.id })
-            })
-          })
-        }
-      })
-    }
+async function interceptionDownload (downloadItem) {
+  const { isInterception } = await getConfig('isInterception')
+  if (!isInterception || !(await isCapture(downloadItem))) {
+    return
+  }
+  chrome.downloads.cancel(downloadItem.id, function () {
+    chrome.downloads.erase({ id: downloadItem.id })
+  })
+  let { rpcLists } = await getConfig('rpcLists')
+  if (!rpcLists) {
+    rpcLists = [{
+      name: 'ARIA2 RPC',
+      path: defaultRPC
+    }]
+  }
+  // filename is usually still empty at onCreated; aria2 then names the file itself
+  aria2Send(rpcLists[0].path, {
+    link: downloadItem.finalUrl,
+    fileName: downloadItem.filename.split(/[/\\]/).pop()
   })
 }
 
-// Register both listeners synchronously; isAutoRename config is checked inside each handler
-chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
-  suggest()
-  getConfig('isAutoRename').then(({ isAutoRename }) => {
-    if (isAutoRename !== false) {
-      interceptionDownload(downloadItem)
-    }
-  })
-})
-
-chrome.downloads.onCreated.addListener(function (downloadItem) {
-  getConfig('isAutoRename').then(({ isAutoRename }) => {
-    if (isAutoRename === false) {
-      interceptionDownload(downloadItem)
-    }
-  })
-})
+// Use onCreated rather than onDeterminingFilename: the latter blocks every download
+// (and the Save As dialog) until this service worker wakes up and replies,
+// even when interception is disabled.
+chrome.downloads.onCreated.addListener(interceptionDownload)
 
 function openYAAW () {
   const index = chrome.runtime.getURL('yaaw/index.html')

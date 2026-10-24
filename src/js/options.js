@@ -5,7 +5,6 @@ const defaultRPC = {
 
 const state = {
   isContextMenus: true,
-  isAutoRename: true,
   isInterception: false,
   isSync: false,
   fileSize: 0,
@@ -80,8 +79,6 @@ function fillI18n () {
   $('config-saved').textContent = i18n('saveSuccess')
   $('label-contextMenus').textContent = i18n('contextMenu')
   $('contextMenuDesc').textContent = i18n('contextMenuDesc')
-  $('label-autoRename').textContent = i18n('autoRename')
-  $('autoRenameDesc').textContent = i18n('autoRenameDesc')
   $('label-syncConfig').textContent = i18n('syncConfig')
   $('syncConfigDesc').textContent = i18n('syncConfigDesc')
   $('label-interception').textContent = i18n('interception')
@@ -98,7 +95,6 @@ function fillI18n () {
 
 function fillForm () {
   $('contextMenus').checked = state.isContextMenus
-  $('autoRename').checked = state.isAutoRename
   $('syncConfig').checked = state.isSync
   $('interception').checked = state.isInterception
   $('fileSize').value = state.fileSize
@@ -110,7 +106,6 @@ function fillForm () {
 
 function bindFormEvents () {
   $('contextMenus').addEventListener('change', e => { state.isContextMenus = e.target.checked })
-  $('autoRename').addEventListener('change', e => { state.isAutoRename = e.target.checked })
   $('syncConfig').addEventListener('change', e => { state.isSync = e.target.checked })
   $('interception').addEventListener('change', e => { state.isInterception = e.target.checked })
   $('fileSize').addEventListener('input', e => { state.fileSize = Number(e.target.value) })
@@ -125,7 +120,6 @@ function bindFormEvents () {
 function saveConfig () {
   const configData = {
     isContextMenus: state.isContextMenus,
-    isAutoRename: state.isAutoRename,
     isInterception: state.isInterception,
     isSync: state.isSync,
     fileSize: state.fileSize,
